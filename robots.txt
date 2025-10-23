@@ -1,0 +1,15 @@
+# robots.txt for OpServe Safety Group LLC
+# https://opservesafetygroup.com/robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /admin-login.html
+Disallow: /admin-dashboard.html
+Disallow: /js/admin-dashboard.js
+Disallow: /css/admin.css
+
+# Sitemap location
+Sitemap: https://opservesafetygroup.com/sitemap.xml
+
+# Crawl-delay (optional)
+Crawl-delay: 10
