@@ -2553,20 +2553,31 @@ function addContactNote(id) {
         return;
     }
     
-    const note = {
-        text: noteText,
-        timestamp: new Date().toISOString()
-    };
+    const timestamp = new Date().toLocaleString();
+    const newNote = `[${timestamp}]\n${noteText}\n\n`;
     
-    contact.notes.push(note);
-    contact.updatedAt = new Date().toISOString();
+    // Append to existing notes or create new
+    const updatedNotes = contact.notes ? contact.notes + newNote : newNote;
     
-    // TODO: Save to Supabase
-    
-    // Refresh modal
-    viewContactDetail(id);
-    
-    showSaveNotification('Note added successfully!');
+    // Update in Supabase
+    window.supabaseClient
+        .from('contacts')
+        .update({ notes: updatedNotes })
+        .eq('id', id)
+        .then(({ error }) => {
+            if (error) {
+                console.error('Error saving note:', error);
+                showError('Failed to save note');
+            } else {
+                // Update local data
+                contact.notes = updatedNotes;
+                
+                // Refresh modal
+                viewContactDetail(id);
+                
+                showSaveNotification('Note added successfully!');
+            }
+        });
 }
 
 // ===== QUOTE MANAGEMENT =====
