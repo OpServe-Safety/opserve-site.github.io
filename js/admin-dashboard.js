@@ -4625,10 +4625,25 @@ async function changeAdminPassword() {
 
 // ===== INTEGRATION SETTINGS =====
 
-function updateIntegrationSetting(service, field, value) {
+async function updateIntegrationSetting(service, field, value) {
     const settings = JSON.parse(localStorage.getItem('adminSettings'));
     settings.integrations[service][field] = value;
     localStorage.setItem('adminSettings', JSON.stringify(settings));
+    
+    // Also save to Supabase so public website can access email settings
+    try {
+        const { error } = await window.supabaseClient
+            .from('settings')
+            .upsert({
+                key: 'adminSettings',
+                value: settings
+            }, { onConflict: 'key' });
+        
+        if (error) throw error;
+    } catch (error) {
+        console.error('Error saving settings to Supabase:', error);
+    }
+    
     showSaveNotification(`${service} settings updated!`);
 }
 
