@@ -585,11 +585,28 @@ async function initializeSettings() {
                 apiKey: '',
                 fromEmail: 'noreply@opservesafetygroup.com'
             },
-            gusto: {
+            payroll: {
+                provider: 'none', // none, gusto, adp, paychex, quickbooks
                 enabled: false,
-                environment: 'sandbox', // sandbox or production
-                apiKey: '',
-                companyId: ''
+                gusto: {
+                    environment: 'sandbox', // sandbox or production
+                    apiToken: '',
+                    companyId: ''
+                },
+                adp: {
+                    clientId: '',
+                    clientSecret: '',
+                    organizationOID: ''
+                },
+                paychex: {
+                    apiKey: '',
+                    companyId: ''
+                },
+                quickbooks: {
+                    clientId: '',
+                    clientSecret: '',
+                    realmId: ''
+                }
             },
             analytics: {
                 googleAnalyticsId: '',
@@ -718,6 +735,14 @@ async function initializeSettings() {
             integrations: {
                 supabase: { ...defaultSettings.integrations.supabase, ...(settings.integrations?.supabase || {}) },
                 emailService: { ...defaultSettings.integrations.emailService, ...(settings.integrations?.emailService || {}) },
+                payroll: {
+                    ...defaultSettings.integrations.payroll,
+                    ...(settings.integrations?.payroll || {}),
+                    gusto: { ...defaultSettings.integrations.payroll.gusto, ...(settings.integrations?.payroll?.gusto || {}) },
+                    adp: { ...defaultSettings.integrations.payroll.adp, ...(settings.integrations?.payroll?.adp || {}) },
+                    paychex: { ...defaultSettings.integrations.payroll.paychex, ...(settings.integrations?.payroll?.paychex || {}) },
+                    quickbooks: { ...defaultSettings.integrations.payroll.quickbooks, ...(settings.integrations?.payroll?.quickbooks || {}) }
+                },
                 analytics: { ...defaultSettings.integrations.analytics, ...(settings.integrations?.analytics || {}) },
                 recaptcha: { ...defaultSettings.integrations.recaptcha, ...(settings.integrations?.recaptcha || {}) }
             },
@@ -1803,62 +1828,148 @@ async function renderSettingsView() {
                     </button>
                 </div>
                 
-                <!-- Gusto Payroll -->
+                <!-- Payroll Integration -->
                 <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 1.1rem;">
-                    <i class="fas fa-users" style="color: #e43b04;"></i> Gusto Payroll
+                    <i class="fas fa-money-check-alt" style="color: #e43b04;"></i> Payroll Integration
                 </h3>
                 
                 <div class="setting-row">
                     <label class="setting-toggle">
-                        <span class="setting-label">Enable Gusto Integration</span>
-                        <input type="checkbox" id="gustoEnabled" ${settings.integrations.gusto?.enabled ? 'checked' : ''} 
-                               onchange="updateIntegrationSetting('gusto', 'enabled', this.checked)">
+                        <span class="setting-label">Enable Payroll Integration</span>
+                        <input type="checkbox" id="payrollEnabled" ${settings.integrations.payroll?.enabled ? 'checked' : ''} 
+                               onchange="updateIntegrationSetting('payroll', 'enabled', this.checked)">
                         <span class="toggle-slider"></span>
                     </label>
                     <small style="display: block; color: #666; margin-top: 5px;">
-                        <i class="fas fa-info-circle"></i> Automatically sync approved applicants to Gusto for onboarding
+                        <i class="fas fa-info-circle"></i> Automatically sync approved applicants to your payroll system for onboarding
                     </small>
                 </div>
                 
                 <div class="setting-row">
-                    <label class="setting-label-full">Environment</label>
-                    <select id="gustoEnvironment" onchange="updateIntegrationSetting('gusto', 'environment', this.value)"
+                    <label class="setting-label-full">Payroll Provider</label>
+                    <select id="payrollProvider" onchange="updateIntegrationSetting('payroll', 'provider', this.value); renderSettingsView();"
                             style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
-                        <option value="sandbox" ${settings.integrations.gusto?.environment === 'sandbox' ? 'selected' : ''}>Sandbox (Testing)</option>
-                        <option value="production" ${settings.integrations.gusto?.environment === 'production' ? 'selected' : ''}>Production</option>
+                        <option value="none" ${settings.integrations.payroll?.provider === 'none' ? 'selected' : ''}>None (Manual Only)</option>
+                        <option value="gusto" ${settings.integrations.payroll?.provider === 'gusto' ? 'selected' : ''}>Gusto</option>
+                        <option value="adp" ${settings.integrations.payroll?.provider === 'adp' ? 'selected' : ''}>ADP Workforce Now</option>
+                        <option value="paychex" ${settings.integrations.payroll?.provider === 'paychex' ? 'selected' : ''}>Paychex Flex</option>
+                        <option value="quickbooks" ${settings.integrations.payroll?.provider === 'quickbooks' ? 'selected' : ''}>QuickBooks Payroll</option>
                     </select>
-                    <small style="display: block; color: #666; margin-top: 5px;">
-                        <i class="fas fa-exclamation-triangle"></i> Use Sandbox for testing, Production for live data
-                    </small>
                 </div>
                 
-                <div class="setting-row">
-                    <label class="setting-label-full">API Key</label>
-                    <input type="password" id="gustoApiKey" value="${settings.integrations.gusto?.apiKey || ''}" 
-                           onchange="updateIntegrationSetting('gusto', 'apiKey', this.value)"
-                           placeholder="Enter your Gusto API token"
-                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
-                    <small style="display: block; color: #666; margin-top: 5px;">
-                        <i class="fas fa-info-circle"></i> Get your API token from <a href="https://dev.gusto.com/" target="_blank">Gusto Developer Portal</a>
-                    </small>
-                </div>
+                ${settings.integrations.payroll?.provider === 'gusto' ? `
+                    <div class="setting-row">
+                        <label class="setting-label-full">Environment</label>
+                        <select id="gustoEnvironment" onchange="updatePayrollSetting('gusto', 'environment', this.value)"
+                                style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <option value="sandbox" ${settings.integrations.payroll.gusto?.environment === 'sandbox' ? 'selected' : ''}>Sandbox (Testing)</option>
+                            <option value="production" ${settings.integrations.payroll.gusto?.environment === 'production' ? 'selected' : ''}>Production</option>
+                        </select>
+                        <small style="display: block; color: #666; margin-top: 5px;">
+                            <i class="fas fa-exclamation-triangle"></i> Use Sandbox for testing, Production for live data
+                        </small>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <label class="setting-label-full">API Token</label>
+                        <input type="password" id="gustoApiToken" value="${settings.integrations.payroll.gusto?.apiToken || ''}" 
+                               onchange="updatePayrollSetting('gusto', 'apiToken', this.value)"
+                               placeholder="Enter your Gusto API token"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                        <small style="display: block; color: #666; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Get your API token from <a href="https://dev.gusto.com/" target="_blank">Gusto Developer Portal</a>
+                        </small>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <label class="setting-label-full">Company ID</label>
+                        <input type="text" id="gustoCompanyId" value="${settings.integrations.payroll.gusto?.companyId || ''}" 
+                               onchange="updatePayrollSetting('gusto', 'companyId', this.value)"
+                               placeholder="Enter your Gusto Company ID"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                        <small style="display: block; color: #666; margin-top: 5px;">
+                            <i class="fas fa-building"></i> Your company's unique identifier in Gusto
+                        </small>
+                    </div>
+                ` : ''}
                 
-                <div class="setting-row">
-                    <label class="setting-label-full">Company ID</label>
-                    <input type="text" id="gustoCompanyId" value="${settings.integrations.gusto?.companyId || ''}" 
-                           onchange="updateIntegrationSetting('gusto', 'companyId', this.value)"
-                           placeholder="Enter your Gusto Company ID"
-                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
-                    <small style="display: block; color: #666; margin-top: 5px;">
-                        <i class="fas fa-building"></i> Your company's unique identifier in Gusto
-                    </small>
-                </div>
+                ${settings.integrations.payroll?.provider === 'adp' ? `
+                    <div class="setting-row">
+                        <label class="setting-label-full">Client ID</label>
+                        <input type="text" id="adpClientId" value="${settings.integrations.payroll.adp?.clientId || ''}" 
+                               onchange="updatePayrollSetting('adp', 'clientId', this.value)"
+                               placeholder="Enter your ADP Client ID"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    </div>
+                    
+                    <div class="setting-row">
+                        <label class="setting-label-full">Client Secret</label>
+                        <input type="password" id="adpClientSecret" value="${settings.integrations.payroll.adp?.clientSecret || ''}" 
+                               onchange="updatePayrollSetting('adp', 'clientSecret', this.value)"
+                               placeholder="Enter your ADP Client Secret"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    </div>
+                    
+                    <div class="setting-row">
+                        <label class="setting-label-full">Organization OID</label>
+                        <input type="text" id="adpOrgOID" value="${settings.integrations.payroll.adp?.organizationOID || ''}" 
+                               onchange="updatePayrollSetting('adp', 'organizationOID', this.value)"
+                               placeholder="Enter your Organization OID"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    </div>
+                ` : ''}
                 
-                <div class="setting-row" style="text-align: center;">
-                    <button class="btn btn-primary" onclick="testGustoConnection()">
-                        <i class="fas fa-plug"></i> Test Gusto Connection
-                    </button>
-                </div>
+                ${settings.integrations.payroll?.provider === 'paychex' ? `
+                    <div class="setting-row">
+                        <label class="setting-label-full">API Key</label>
+                        <input type="password" id="paychexApiKey" value="${settings.integrations.payroll.paychex?.apiKey || ''}" 
+                               onchange="updatePayrollSetting('paychex', 'apiKey', this.value)"
+                               placeholder="Enter your Paychex API Key"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    </div>
+                    
+                    <div class="setting-row">
+                        <label class="setting-label-full">Company ID</label>
+                        <input type="text" id="paychexCompanyId" value="${settings.integrations.payroll.paychex?.companyId || ''}" 
+                               onchange="updatePayrollSetting('paychex', 'companyId', this.value)"
+                               placeholder="Enter your Company ID"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    </div>
+                ` : ''}
+                
+                ${settings.integrations.payroll?.provider === 'quickbooks' ? `
+                    <div class="setting-row">
+                        <label class="setting-label-full">Client ID</label>
+                        <input type="text" id="qbClientId" value="${settings.integrations.payroll.quickbooks?.clientId || ''}" 
+                               onchange="updatePayrollSetting('quickbooks', 'clientId', this.value)"
+                               placeholder="Enter your QuickBooks Client ID"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    </div>
+                    
+                    <div class="setting-row">
+                        <label class="setting-label-full">Client Secret</label>
+                        <input type="password" id="qbClientSecret" value="${settings.integrations.payroll.quickbooks?.clientSecret || ''}" 
+                               onchange="updatePayrollSetting('quickbooks', 'clientSecret', this.value)"
+                               placeholder="Enter your Client Secret"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    </div>
+                    
+                    <div class="setting-row">
+                        <label class="setting-label-full">Realm ID</label>
+                        <input type="text" id="qbRealmId" value="${settings.integrations.payroll.quickbooks?.realmId || ''}" 
+                               onchange="updatePayrollSetting('quickbooks', 'realmId', this.value)"
+                               placeholder="Enter your Realm ID (Company ID)"
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    </div>
+                ` : ''}
+                
+                ${settings.integrations.payroll?.provider && settings.integrations.payroll?.provider !== 'none' ? `
+                    <div class="setting-row" style="text-align: center;">
+                        <button class="btn btn-primary" onclick="testPayrollConnection()">
+                            <i class="fas fa-plug"></i> Test Connection
+                        </button>
+                    </div>
+                ` : ''}
                 
                 <!-- Google Analytics -->
                 <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 1.1rem;">
@@ -5168,6 +5279,31 @@ async function updateIntegrationSetting(service, field, value) {
     showSaveNotification(`${service} settings updated!`);
 }
 
+async function updatePayrollSetting(provider, field, value) {
+    const settings = JSON.parse(localStorage.getItem('adminSettings'));
+    if (!settings.integrations.payroll[provider]) {
+        settings.integrations.payroll[provider] = {};
+    }
+    settings.integrations.payroll[provider][field] = value;
+    localStorage.setItem('adminSettings', JSON.stringify(settings));
+    
+    // Also save to Supabase
+    try {
+        const { error } = await window.supabaseClient
+            .from('settings')
+            .upsert({
+                key: 'adminSettings',
+                value: settings
+            }, { onConflict: 'key' });
+        
+        if (error) throw error;
+    } catch (error) {
+        console.error('Error saving settings to Supabase:', error);
+    }
+    
+    showSaveNotification(`Payroll settings updated!`);
+}
+
 async function testSupabaseConnection() {
     const button = event.target.closest('button');
     const originalHTML = button.innerHTML;
@@ -5371,7 +5507,7 @@ async function testEmailConnection() {
     }
 }
 
-async function testGustoConnection() {
+async function testPayrollConnection() {
     const button = event.target.closest('button');
     const originalHTML = button.innerHTML;
     button.disabled = true;
@@ -5380,48 +5516,69 @@ async function testGustoConnection() {
     try {
         // Get current settings
         const settings = JSON.parse(localStorage.getItem('adminSettings'));
-        const gustoConfig = settings.integrations.gusto;
+        const payrollConfig = settings.integrations.payroll;
+        const provider = payrollConfig.provider;
         
-        if (!gustoConfig.apiKey) {
-            throw new Error('API Key is required');
+        if (!provider || provider === 'none') {
+            throw new Error('Please select a payroll provider');
         }
         
-        if (!gustoConfig.companyId) {
-            throw new Error('Company ID is required');
-        }
-        
-        // Determine API base URL based on environment
-        const baseUrl = gustoConfig.environment === 'production' 
-            ? 'https://api.gusto.com'
-            : 'https://api.gusto-demo.com';
-        
-        // Test API connection by fetching company info
-        const response = await fetch(`${baseUrl}/v1/companies/${gustoConfig.companyId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${gustoConfig.apiKey}`,
-                'Content-Type': 'application/json'
+        // Test based on provider
+        if (provider === 'gusto') {
+            const gustoConfig = payrollConfig.gusto;
+            
+            if (!gustoConfig.apiToken) {
+                throw new Error('API Token is required');
             }
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || `Failed to connect (${response.status})`);
+            
+            if (!gustoConfig.companyId) {
+                throw new Error('Company ID is required');
+            }
+            
+            // Determine API base URL based on environment
+            const baseUrl = gustoConfig.environment === 'production' 
+                ? 'https://api.gusto.com'
+                : 'https://api.gusto-demo.com';
+            
+            // Test API connection by fetching company info
+            const response = await fetch(`${baseUrl}/v1/companies/${gustoConfig.companyId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${gustoConfig.apiToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || `Failed to connect (${response.status})`);
+            }
+            
+            const companyData = await response.json();
+            
+            // Success
+            button.innerHTML = '<i class="fas fa-check"></i> Connected!';
+            button.style.background = '#4caf50';
+            
+            alert(
+                '✅ Gusto Connection Successful!\n\n' +
+                `🏢 Company: ${companyData.name || 'Unknown'}\n` +
+                `🌍 Environment: ${gustoConfig.environment.toUpperCase()}\n` +
+                `🆔 Company ID: ${gustoConfig.companyId}\n\n` +
+                'Connection verified! You can now sync approved applicants to Gusto.'
+            );
+            
+        } else {
+            // For other providers, show a placeholder message
+            button.innerHTML = '<i class="fas fa-info-circle"></i> Not Implemented';
+            button.style.background = '#ffa500';
+            
+            alert(
+                `ℹ️ ${provider.toUpperCase()} Integration\n\n` +
+                `Testing for ${provider.charAt(0).toUpperCase() + provider.slice(1)} is not yet implemented.\n\n` +
+                'This feature will be added when you configure this provider.'
+            );
         }
-        
-        const companyData = await response.json();
-        
-        // Success
-        button.innerHTML = '<i class="fas fa-check"></i> Connected!';
-        button.style.background = '#4caf50';
-        
-        alert(
-            '✅ Gusto Connection Successful!\n\n' +
-            `🏢 Company: ${companyData.name || 'Unknown'}\n` +
-            `🌍 Environment: ${gustoConfig.environment.toUpperCase()}\n` +
-            `🆔 Company ID: ${gustoConfig.companyId}\n\n` +
-            'Connection verified! You can now sync approved applicants to Gusto.'
-        );
         
         setTimeout(() => {
             button.innerHTML = originalHTML;
@@ -5430,17 +5587,17 @@ async function testGustoConnection() {
         }, 3000);
         
     } catch (error) {
-        console.error('Gusto test failed:', error);
+        console.error('Payroll connection test failed:', error);
         button.innerHTML = '<i class="fas fa-times"></i> Failed';
         button.style.background = '#dc3545';
         
         alert(
-            '❌ Gusto Connection Failed\n\n' +
+            '❌ Payroll Connection Failed\n\n' +
             `Error: ${error.message}\n\n` +
             'Please check:\n' +
-            '• API Key is correct and valid\n' +
-            '• Company ID matches your Gusto account\n' +
-            '• Environment is set correctly (Sandbox/Production)\n' +
+            '• All required fields are filled in\n' +
+            '• API credentials are correct and valid\n' +
+            '• Account IDs match your payroll system\n' +
             '• API token has necessary permissions'
         );
         
