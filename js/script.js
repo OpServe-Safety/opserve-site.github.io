@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Form submission
     if (applicationForm) {
-        applicationForm.addEventListener('submit', function(e) {
+        applicationForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Validate that at least one file is selected
@@ -307,35 +307,55 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get form data
             const formData = new FormData(this);
             
-            // Remove the empty file input and add the actual selected files
-            formData.delete('resume[]');
-            selectedFiles.forEach((file, index) => {
-                formData.append('resume[]', file);
-            });
+            // Prepare application data
+            const applicationData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                position: formData.get('position'),
+                experience: formData.get('experience'),
+                availability: formData.get('availability'),
+                certifications: formData.get('certifications') || '',
+                resume_url: null, // TODO: Upload files to Supabase Storage
+                status: 'new',
+                created_at: new Date().toISOString()
+            };
             
-            // Here you would typically send the form data to a server
-            console.log('Application submitted with', selectedFiles.length, 'file(s)');
-            console.log('Files:', selectedFiles.map(f => f.name));
-            
-            // Show success message
-            alert('Thank you for your application! We will review your information and get back to you soon.');
-            
-            // Reset form and close modal
-            this.reset();
-            selectedFiles = [];
-            updateFileList();
-            
-            // Reset work history to show only one entry
-            const entries = workHistoryContainer.querySelectorAll('.work-history-entry');
-            entries.forEach((entry, index) => {
-                if (index > 0) entry.remove();
-            });
-            
-            modal.classList.remove('active');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
-            document.body.style.overflow = 'auto';
+            try {
+                // Save to Supabase
+                const { data, error } = await window.supabaseClient
+                    .from('applications')
+                    .insert([applicationData]);
+                
+                if (error) throw error;
+                
+                // TODO: Upload files to Supabase Storage and update application with file URLs
+                console.log('Application submitted with', selectedFiles.length, 'file(s)');
+                console.log('Files:', selectedFiles.map(f => f.name));
+                
+                // Show success message
+                alert('Thank you for your application! We will review your information and get back to you soon.');
+                
+                // Reset form and close modal
+                this.reset();
+                selectedFiles = [];
+                updateFileList();
+                
+                // Reset work history to show only one entry
+                const entries = workHistoryContainer.querySelectorAll('.work-history-entry');
+                entries.forEach((entry, index) => {
+                    if (index > 0) entry.remove();
+                });
+                
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+                document.body.style.overflow = 'auto';
+            } catch (error) {
+                console.error('Error submitting application:', error);
+                alert('Sorry, there was an error submitting your application. Please try again or email us directly.');
+            }
         });
     }
 
@@ -729,21 +749,40 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Contact form submission
     if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
+        contactForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Get form data
             const formData = new FormData(this);
+            const contactData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                state: formData.get('state'),
+                service: formData.get('service'),
+                message: formData.get('message'),
+                status: 'new',
+                created_at: new Date().toISOString()
+            };
             
-            // Here you would typically send the form data to a server
-            console.log('Contact form submitted:', Object.fromEntries(formData));
-            
-            // Show success message
-            alert('Thank you for contacting us! We will get back to you as soon as possible.');
-            
-            // Reset form and close modal
-            this.reset();
-            closeContactModalFn();
+            try {
+                // Save to Supabase
+                const { data, error } = await window.supabaseClient
+                    .from('contacts')
+                    .insert([contactData]);
+                
+                if (error) throw error;
+                
+                // Show success message
+                alert('Thank you for contacting us! We will get back to you as soon as possible.');
+                
+                // Reset form and close modal
+                this.reset();
+                closeContactModalFn();
+            } catch (error) {
+                console.error('Error submitting contact form:', error);
+                alert('Sorry, there was an error submitting your message. Please try again or email us directly.');
+            }
         });
     }
 
