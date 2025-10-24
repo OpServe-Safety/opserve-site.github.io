@@ -415,12 +415,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Send confirmation email
                 try {
-                    const emailHTML = generateApplicationEmailHTML(firstName, formData.get('position'));
-                    await sendEmailViaResend(
-                        formData.get('email'),
-                        'Application Received - OpServe Safety Group',
-                        emailHTML
-                    );
+                    // Get email settings
+                    const { data: settingsData } = await window.supabaseClient
+                        .from('settings')
+                        .select('value')
+                        .eq('key', 'adminSettings')
+                        .single();
+                    
+                    const settings = settingsData?.value || {};
+                    const appEmailTemplate = settings.emailNotifications?.applicationEmail;
+                    
+                    // Only send if enabled and template exists
+                    if (appEmailTemplate?.enabled) {
+                        const emailHTML = generateApplicationEmailHTML(firstName, formData.get('position'), appEmailTemplate);
+                        await sendEmailViaResend(
+                            formData.get('email'),
+                            appEmailTemplate.subject,
+                            emailHTML
+                        );
+                    }
                 } catch (emailError) {
                     console.error('Failed to send confirmation email:', emailError);
                     // Continue anyway - application was saved
@@ -502,8 +515,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Generate application confirmation email
-    function generateApplicationEmailHTML(firstName, position) {
+    // Generate application confirmation email from template
+    function generateApplicationEmailHTML(firstName, position, template) {
+        // Replace placeholders in template
+        const greeting = template.greeting.replace('{firstName}', firstName);
+        const body = template.body
+            .replace(/{firstName}/g, firstName)
+            .replace(/{position}/g, position)
+            .replace(/\n/g, '<br>');
+        const closing = template.closing.replace(/\n/g, '<br>');
+        
         return `
             <!DOCTYPE html>
             <html>
@@ -515,7 +536,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
                     .button { display: inline-block; background: #e43b04; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
                     .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
-                    .highlight-box { background: #fff5f0; padding: 20px; border-left: 4px solid #e43b04; border-radius: 4px; margin: 20px 0; }
                 </style>
             </head>
             <body>
@@ -524,26 +544,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>Professional Security Services</p>
                 </div>
                 <div class="content">
-                    <h2>Thank You for Your Application!</h2>
-                    <p>Dear ${firstName},</p>
-                    <p>We have successfully received your application for the <strong>${position}</strong> position at OpServe Safety Group.</p>
-                    
-                    <div class="highlight-box">
-                        <h3 style="margin-top: 0;">What Happens Next?</h3>
-                        <ol style="margin: 10px 0;">
-                            <li>Our recruitment team will review your application and qualifications</li>
-                            <li>If your skills match our requirements, we'll contact you for an interview</li>
-                            <li>We typically respond within 5-7 business days</li>
-                        </ol>
-                    </div>
-                    
-                    <p>We appreciate your interest in joining our team. OpServe Safety Group is committed to providing professional security services, and we're always looking for dedicated individuals to grow with us.</p>
-                    
-                    <p>If you have any questions in the meantime, please don't hesitate to reach out to us.</p>
-                    
-                    <p style="margin-top: 30px;">Best regards,<br><strong>OpServe Safety Group Recruitment Team</strong></p>
+                    <p>${greeting}</p>
+                    <p>${body}</p>
+                    <p style="margin-top: 30px;">${closing}</p>
                 </div>
-                
                 <div class="footer">
                     <p>OpServe Safety Group | Professional Security Services</p>
                     <p><a href="https://opservesafetygroup.com">opservesafetygroup.com</a></p>
@@ -554,8 +558,16 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
     }
     
-    // Generate contact confirmation email
-    function generateContactEmailHTML(name, service) {
+    // Generate contact confirmation email from template
+    function generateContactEmailHTML(name, service, template) {
+        // Replace placeholders in template
+        const greeting = template.greeting.replace('{name}', name);
+        const body = template.body
+            .replace(/{name}/g, name)
+            .replace(/{service}/g, service)
+            .replace(/\n/g, '<br>');
+        const closing = template.closing.replace(/\n/g, '<br>');
+        
         return `
             <!DOCTYPE html>
             <html>
@@ -567,7 +579,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
                     .button { display: inline-block; background: #e43b04; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
                     .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
-                    .highlight-box { background: #fff5f0; padding: 20px; border-left: 4px solid #e43b04; border-radius: 4px; margin: 20px 0; }
                 </style>
             </head>
             <body>
@@ -576,26 +587,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>Professional Security Services</p>
                 </div>
                 <div class="content">
-                    <h2>We Received Your Message!</h2>
-                    <p>Dear ${name},</p>
-                    <p>Thank you for contacting OpServe Safety Group. We have received your inquiry regarding <strong>${service}</strong>.</p>
-                    
-                    <div class="highlight-box">
-                        <h3 style="margin-top: 0;">What's Next?</h3>
-                        <p style="margin: 10px 0;">Our team will review your message and get back to you within 24-48 hours. We're committed to providing you with the professional security solutions you need.</p>
-                    </div>
-                    
-                    <p>In the meantime, feel free to explore our services and learn more about what makes OpServe Safety Group the trusted choice for security services:</p>
-                    
+                    <p>${greeting}</p>
+                    <p>${body}</p>
                     <center>
                         <a href="https://opservesafetygroup.com#services" class="button">View Our Services</a>
                     </center>
-                    
-                    <p>For urgent matters, please call us directly.</p>
-                    
-                    <p style="margin-top: 30px;">Best regards,<br><strong>OpServe Safety Group Team</strong></p>
+                    <p style="margin-top: 30px;">${closing}</p>
                 </div>
-                
                 <div class="footer">
                     <p>OpServe Safety Group | Professional Security Services</p>
                     <p><a href="https://opservesafetygroup.com">opservesafetygroup.com</a></p>
@@ -1070,12 +1068,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Send confirmation email
                 try {
-                    const emailHTML = generateContactEmailHTML(formData.get('name'), formData.get('service'));
-                    await sendEmailViaResend(
-                        formData.get('email'),
-                        'Message Received - OpServe Safety Group',
-                        emailHTML
-                    );
+                    // Get email settings
+                    const { data: settingsData } = await window.supabaseClient
+                        .from('settings')
+                        .select('value')
+                        .eq('key', 'adminSettings')
+                        .single();
+                    
+                    const settings = settingsData?.value || {};
+                    const contactEmailTemplate = settings.emailNotifications?.contactEmail;
+                    
+                    // Only send if enabled and template exists
+                    if (contactEmailTemplate?.enabled) {
+                        const emailHTML = generateContactEmailHTML(formData.get('name'), formData.get('service'), contactEmailTemplate);
+                        await sendEmailViaResend(
+                            formData.get('email'),
+                            contactEmailTemplate.subject,
+                            emailHTML
+                        );
+                    }
                 } catch (emailError) {
                     console.error('Failed to send confirmation email:', emailError);
                     // Continue anyway - contact was saved

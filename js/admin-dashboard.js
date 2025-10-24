@@ -557,13 +557,23 @@ async function initializeSettings() {
             { value: 'other', label: 'Other', active: true }
         ],
         emailNotifications: {
-            enabled: true,
             adminEmail: 'admin@opservesafetygroup.com',
-            notifyOnApplication: true,
-            notifyOnContact: true,
-            autoReplyEnabled: true,
-            autoReplySubject: 'Application Received - OpServe Safety Group',
-            autoReplyMessage: 'Thank you for your application to OpServe Safety Group. We have received your submission and will review it shortly. We will contact you if your qualifications match our current openings.\n\nBest regards,\nOpServe Safety Group Team'
+            notifyAdminOnApplication: true,
+            notifyAdminOnContact: true,
+            applicationEmail: {
+                enabled: true,
+                subject: 'Application Received - OpServe Safety Group',
+                greeting: 'Dear {firstName},',
+                body: 'We have successfully received your application for the <strong>{position}</strong> position at OpServe Safety Group.\n\nOur recruitment team will review your application and qualifications. If your skills match our requirements, we\'ll contact you for an interview. We typically respond within 5-7 business days.\n\nWe appreciate your interest in joining our team. OpServe Safety Group is committed to providing professional security services, and we\'re always looking for dedicated individuals to grow with us.',
+                closing: 'Best regards,\nOpServe Safety Group Recruitment Team'
+            },
+            contactEmail: {
+                enabled: true,
+                subject: 'Message Received - OpServe Safety Group',
+                greeting: 'Dear {name},',
+                body: 'Thank you for contacting OpServe Safety Group. We have received your inquiry regarding <strong>{service}</strong>.\n\nOur team will review your message and get back to you within 24-48 hours. We\'re committed to providing you with the professional security solutions you need.',
+                closing: 'Best regards,\nOpServe Safety Group Team'
+            }
         },
         security: {
             sessionTimeout: 24, // hours
@@ -1343,67 +1353,148 @@ async function renderSettingsView() {
                 </div>
             </div>
             
-            <!-- Email Notifications Section -->
+            <!-- Automated Email Templates Section -->
             <div class="settings-section">
-                <h2><i class="fas fa-envelope"></i> Email Notifications</h2>
+                <h2><i class="fas fa-envelope"></i> Automated Email Templates</h2>
                 <div class="section-content">
-                    <p style="color: #6c757d; margin-bottom: 25px;">Configure how you receive notifications about applications and contact form submissions.</p>
+                    <p style="color: #6c757d; margin-bottom: 25px;">Customize the automated emails sent to applicants and contact form submitters. Use placeholders like {firstName}, {position}, {name}, {service}.</p>
                 
-                <div class="setting-row">
-                    <label class="setting-toggle">
-                        <span class="setting-label">Enable Email Notifications</span>
-                        <input type="checkbox" id="emailEnabled" ${settings.emailNotifications.enabled ? 'checked' : ''} onchange="updateEmailSetting('enabled', this.checked)">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
+                <!-- Admin Notifications -->
+                <h3 style="margin-top: 20px; margin-bottom: 15px; font-size: 1.1rem;">
+                    <i class="fas fa-bell" style="color: #e43b04;"></i> Admin Notifications
+                </h3>
                 
                 <div class="setting-row">
                     <label class="setting-label-full">Admin Email Address</label>
-                    <input type="email" id="adminEmail" value="${settings.emailNotifications.adminEmail}" 
+                    <input type="email" value="${settings.emailNotifications.adminEmail}" 
                            onchange="updateEmailSetting('adminEmail', this.value)"
                            placeholder="admin@opservesafetygroup.com"
                            style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Where to send admin notifications
+                    </small>
                 </div>
                 
                 <div class="setting-row">
                     <label class="setting-toggle">
-                        <span class="setting-label">Notify on New Applications</span>
-                        <input type="checkbox" id="notifyApplication" ${settings.emailNotifications.notifyOnApplication ? 'checked' : ''} 
-                               onchange="updateEmailSetting('notifyOnApplication', this.checked)">
+                        <span class="setting-label">Notify Admin on New Applications</span>
+                        <input type="checkbox" ${settings.emailNotifications.notifyAdminOnApplication ? 'checked' : ''} 
+                               onchange="updateEmailSetting('notifyAdminOnApplication', this.checked)">
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
                 
                 <div class="setting-row">
                     <label class="setting-toggle">
-                        <span class="setting-label">Notify on Contact Form Submissions</span>
-                        <input type="checkbox" id="notifyContact" ${settings.emailNotifications.notifyOnContact ? 'checked' : ''} 
-                               onchange="updateEmailSetting('notifyOnContact', this.checked)">
+                        <span class="setting-label">Notify Admin on Contact Form Submissions</span>
+                        <input type="checkbox" ${settings.emailNotifications.notifyAdminOnContact ? 'checked' : ''} 
+                               onchange="updateEmailSetting('notifyAdminOnContact', this.checked)">
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
+                
+                <!-- Application Confirmation Email -->
+                <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 1.1rem;">
+                    <i class="fas fa-briefcase" style="color: #e43b04;"></i> Application Confirmation Email
+                </h3>
                 
                 <div class="setting-row">
                     <label class="setting-toggle">
-                        <span class="setting-label">Send Auto-Reply to Applicants</span>
-                        <input type="checkbox" id="autoReply" ${settings.emailNotifications.autoReplyEnabled ? 'checked' : ''} 
-                               onchange="updateEmailSetting('autoReplyEnabled', this.checked)">
+                        <span class="setting-label">Send Confirmation to Applicants</span>
+                        <input type="checkbox" ${settings.emailNotifications.applicationEmail.enabled ? 'checked' : ''} 
+                               onchange="updateEmailTemplateSetting('applicationEmail', 'enabled', this.checked)">
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
                 
                 <div class="setting-row">
-                    <label class="setting-label-full">Auto-Reply Subject</label>
-                    <input type="text" id="autoReplySubject" value="${settings.emailNotifications.autoReplySubject}" 
-                           onchange="updateEmailSetting('autoReplySubject', this.value)"
+                    <label class="setting-label-full">Subject Line</label>
+                    <input type="text" value="${settings.emailNotifications.applicationEmail.subject}" 
+                           onchange="updateEmailTemplateSetting('applicationEmail', 'subject', this.value)"
+                           placeholder="Application Received - OpServe Safety Group"
                            style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
                 </div>
                 
                 <div class="setting-row">
-                    <label class="setting-label-full">Auto-Reply Message</label>
-                    <textarea id="autoReplyMessage" rows="5" 
-                              onchange="updateEmailSetting('autoReplyMessage', this.value)"
-                              style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">${settings.emailNotifications.autoReplyMessage}</textarea>
+                    <label class="setting-label-full">Greeting</label>
+                    <input type="text" value="${settings.emailNotifications.applicationEmail.greeting}" 
+                           onchange="updateEmailTemplateSetting('applicationEmail', 'greeting', this.value)"
+                           placeholder="Dear {firstName},"
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Use {firstName} for applicant's name
+                    </small>
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">Email Body</label>
+                    <textarea rows="6" 
+                              onchange="updateEmailTemplateSetting('applicationEmail', 'body', this.value)"
+                              placeholder="Email body text..."
+                              style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">${settings.emailNotifications.applicationEmail.body}</textarea>
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Use {position} for job position. HTML tags like &lt;strong&gt; are supported.
+                    </small>
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">Closing</label>
+                    <textarea rows="2" 
+                              onchange="updateEmailTemplateSetting('applicationEmail', 'closing', this.value)"
+                              placeholder="Best regards, Team"
+                              style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">${settings.emailNotifications.applicationEmail.closing}</textarea>
+                </div>
+                
+                <!-- Contact Form Confirmation Email -->
+                <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 1.1rem;">
+                    <i class="fas fa-comments" style="color: #e43b04;"></i> Contact Form Confirmation Email
+                </h3>
+                
+                <div class="setting-row">
+                    <label class="setting-toggle">
+                        <span class="setting-label">Send Confirmation to Contacts</span>
+                        <input type="checkbox" ${settings.emailNotifications.contactEmail.enabled ? 'checked' : ''} 
+                               onchange="updateEmailTemplateSetting('contactEmail', 'enabled', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">Subject Line</label>
+                    <input type="text" value="${settings.emailNotifications.contactEmail.subject}" 
+                           onchange="updateEmailTemplateSetting('contactEmail', 'subject', this.value)"
+                           placeholder="Message Received - OpServe Safety Group"
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">Greeting</label>
+                    <input type="text" value="${settings.emailNotifications.contactEmail.greeting}" 
+                           onchange="updateEmailTemplateSetting('contactEmail', 'greeting', this.value)"
+                           placeholder="Dear {name},"
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Use {name} for contact's name
+                    </small>
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">Email Body</label>
+                    <textarea rows="6" 
+                              onchange="updateEmailTemplateSetting('contactEmail', 'body', this.value)"
+                              placeholder="Email body text..."
+                              style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">${settings.emailNotifications.contactEmail.body}</textarea>
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Use {service} for the service they're interested in. HTML tags like &lt;strong&gt; are supported.
+                    </small>
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">Closing</label>
+                    <textarea rows="2" 
+                              onchange="updateEmailTemplateSetting('contactEmail', 'closing', this.value)"
+                              placeholder="Best regards, Team"
+                              style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">${settings.emailNotifications.contactEmail.closing}</textarea>
                 </div>
                 </div>
             </div>
@@ -4552,11 +4643,44 @@ function addAddon(serviceKey) {
 
 // ===== EMAIL NOTIFICATION SETTINGS =====
 
-function updateEmailSetting(field, value) {
+async function updateEmailSetting(field, value) {
     const settings = JSON.parse(localStorage.getItem('adminSettings'));
     settings.emailNotifications[field] = value;
     localStorage.setItem('adminSettings', JSON.stringify(settings));
+    
+    // Save to Supabase
+    try {
+        await window.supabaseClient
+            .from('settings')
+            .upsert({
+                key: 'adminSettings',
+                value: settings
+            }, { onConflict: 'key' });
+    } catch (error) {
+        console.error('Error saving to Supabase:', error);
+    }
+    
     showSaveNotification('Email settings updated!');
+}
+
+async function updateEmailTemplateSetting(template, field, value) {
+    const settings = JSON.parse(localStorage.getItem('adminSettings'));
+    settings.emailNotifications[template][field] = value;
+    localStorage.setItem('adminSettings', JSON.stringify(settings));
+    
+    // Save to Supabase
+    try {
+        await window.supabaseClient
+            .from('settings')
+            .upsert({
+                key: 'adminSettings',
+                value: settings
+            }, { onConflict: 'key' });
+    } catch (error) {
+        console.error('Error saving to Supabase:', error);
+    }
+    
+    showSaveNotification('Email template updated!');
 }
 
 // ===== SECURITY SETTINGS =====
