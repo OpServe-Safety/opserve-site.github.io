@@ -1892,6 +1892,44 @@ async function renderContactsView() {
             </button>
         </div>
         
+        <!-- Filter Modal -->
+        <div class="filter-modal" id="contactsFilterModal">
+            <div class="filter-modal-content">
+                <div class="filter-modal-header">
+                    <h3><i class="fas fa-filter"></i> Filter Messages</h3>
+                    <button class="filter-modal-close" onclick="closeFilterModal('contacts')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="filter-modal-body">
+                    <div class="filter-modal-option active" onclick="selectMobileFilter('contacts', 'all', this)">
+                        <input type="radio" name="contactFilter" value="all" checked>
+                        <label>All Messages</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('contacts', 'new', this)">
+                        <input type="radio" name="contactFilter" value="new">
+                        <label>New</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('contacts', 'contacted', this)">
+                        <input type="radio" name="contactFilter" value="contacted">
+                        <label>Contacted</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('contacts', 'quote-sent', this)">
+                        <input type="radio" name="contactFilter" value="quote-sent">
+                        <label>Quote Sent</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('contacts', 'converted', this)">
+                        <input type="radio" name="contactFilter" value="converted">
+                        <label>Converted</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('contacts', 'not-interested', this)">
+                        <input type="radio" name="contactFilter" value="not-interested">
+                        <label>Not Interested</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Contacts Table -->
         <div class="applications-container">
             <div class="table-responsive">
@@ -2100,6 +2138,40 @@ async function renderQuotesView() {
                 <span>Filters</span>
                 <span class="badge" id="quoteFilterBadge">All</span>
             </button>
+        </div>
+        
+        <!-- Filter Modal -->
+        <div class="filter-modal" id="quotesFilterModal">
+            <div class="filter-modal-content">
+                <div class="filter-modal-header">
+                    <h3><i class="fas fa-filter"></i> Filter Quotes</h3>
+                    <button class="filter-modal-close" onclick="closeFilterModal('quotes')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="filter-modal-body">
+                    <div class="filter-modal-option active" onclick="selectMobileFilter('quotes', 'all', this)">
+                        <input type="radio" name="quoteFilter" value="all" checked>
+                        <label>All Quotes</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('quotes', 'pending', this)">
+                        <input type="radio" name="quoteFilter" value="pending">
+                        <label>Pending</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('quotes', 'sent', this)">
+                        <input type="radio" name="quoteFilter" value="sent">
+                        <label>Sent</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('quotes', 'accepted', this)">
+                        <input type="radio" name="quoteFilter" value="accepted">
+                        <label>Accepted</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('quotes', 'declined', this)">
+                        <input type="radio" name="quoteFilter" value="declined">
+                        <label>Declined</label>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Quotes Table -->
