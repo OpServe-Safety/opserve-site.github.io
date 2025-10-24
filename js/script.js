@@ -336,6 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 other_position: formData.get('otherPosition') || null,
                 experience: formData.get('experience'),
                 work_history: workHistory,
+                file_urls: selectedFiles.map(f => f.name),
                 status: 'new'
             };
             

@@ -115,9 +115,29 @@ function logout() {
 // Load applications
 async function loadApplications() {
     try {
-        // TODO: Replace with Supabase query
-        // For now, use sample data
-        const applications = getSampleApplications();
+        // Load from Supabase
+        const { data, error } = await window.supabaseClient
+            .from('applications')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        // Transform Supabase data to match UI format
+        const applications = (data || []).map(app => ({
+            id: app.id,
+            firstName: app.name ? app.name.split(' ')[0] : '',
+            lastName: app.name ? app.name.split(' ').slice(1).join(' ') : '',
+            email: app.email,
+            phone: app.phone,
+            position: app.position,
+            other_position: app.other_position,
+            experience: app.experience,
+            workHistory: app.work_history || [],
+            status: app.status || 'new',
+            createdAt: app.created_at,
+            notes: app.notes
+        }));
         
         // Update stats
         updateStats(applications);
@@ -129,7 +149,7 @@ async function loadApplications() {
         window.allApplications = applications;
     } catch (error) {
         console.error('Error loading applications:', error);
-        showError('Failed to load applications');
+        showError('Failed to load applications. ' + error.message);
     }
 }
 
