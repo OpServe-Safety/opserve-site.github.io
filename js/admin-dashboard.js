@@ -927,7 +927,7 @@ function renderApplicationsView() {
 let openSettingsSections = [];
 
 // Render settings view
-function renderSettingsView() {
+async function renderSettingsView() {
     // Save current open sections before re-rendering
     const sections = document.querySelectorAll('.settings-section');
     openSettingsSections = [];
@@ -1763,8 +1763,10 @@ function renderSettingsView() {
     `;
     
     // Set admin email
-    const auth = JSON.parse(sessionStorage.getItem('adminAuth'));
-    document.getElementById('adminEmail').textContent = auth.email;
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+    if (session?.user?.email) {
+        document.getElementById('adminEmail').textContent = session.user.email;
+    }
     
     // Initialize drag and drop
     initializeDragAndDrop();
@@ -2013,8 +2015,10 @@ async function renderContactsView() {
     `;
     
     // Set admin email
-    const auth = JSON.parse(sessionStorage.getItem('adminAuth'));
-    document.getElementById('adminEmail').textContent = auth.email;
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+    if (session?.user?.email) {
+        document.getElementById('adminEmail').textContent = session.user.email;
+    }
     
     // Render contacts table
     renderContactsTable(filteredContacts);
@@ -2258,8 +2262,10 @@ async function renderQuotesView() {
     `;
     
     // Set admin email
-    const auth = JSON.parse(sessionStorage.getItem('adminAuth'));
-    document.getElementById('adminEmail').textContent = auth.email;
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+    if (session?.user?.email) {
+        document.getElementById('adminEmail').textContent = session.user.email;
+    }
     
     // Render quotes table
     renderQuotesTable(filteredQuotes);
