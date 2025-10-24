@@ -599,8 +599,8 @@ function initializeSettings() {
             quoteSettings: settings.quoteSettings ? {
                 ...defaultSettings.quoteSettings,
                 ...settings.quoteSettings,
-                services: settings.quoteSettings.services || defaultSettings.quoteSettings.services,
-                paymentTerms: settings.quoteSettings.paymentTerms || defaultSettings.quoteSettings.paymentTerms
+                services: settings.quoteSettings?.services || defaultSettings.quoteSettings.services,
+                paymentTerms: settings.quoteSettings?.paymentTerms || defaultSettings.quoteSettings.paymentTerms
             } : defaultSettings.quoteSettings,
             websiteContent: settings.websiteContent ? {
                 hero: { ...defaultSettings.websiteContent.hero, ...(settings.websiteContent.hero || {}) },
