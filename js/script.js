@@ -308,17 +308,36 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(this);
             
             // Prepare application data
+            const firstName = formData.get('firstName') || '';
+            const middleInitial = formData.get('middleInitial') || '';
+            const lastName = formData.get('lastName') || '';
+            const fullName = `${firstName} ${middleInitial ? middleInitial + ' ' : ''}${lastName}`.trim();
+            
+            // Collect work history
+            const jobTitles = formData.getAll('jobTitle[]');
+            const companies = formData.getAll('company[]');
+            const startDates = formData.getAll('startDate[]');
+            const endDates = formData.getAll('endDate[]');
+            const jobDescriptions = formData.getAll('jobDescription[]');
+            
+            const workHistory = jobTitles.map((title, index) => ({
+                jobTitle: title,
+                company: companies[index],
+                startDate: startDates[index],
+                endDate: endDates[index],
+                description: jobDescriptions[index]
+            }));
+            
             const applicationData = {
-                name: formData.get('name'),
+                name: fullName,
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 position: formData.get('position'),
+                other_position: formData.get('otherPosition') || null,
                 experience: formData.get('experience'),
-                availability: formData.get('availability'),
-                certifications: formData.get('certifications') || '',
-                resume_url: null, // TODO: Upload files to Supabase Storage
-                status: 'new',
-                created_at: new Date().toISOString()
+                work_history: workHistory,
+                file_urls: selectedFiles.map(f => f.name), // Store file names for now
+                status: 'new'
             };
             
             try {
