@@ -566,48 +566,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== EMAIL FUNCTIONS =====
     
-    // Send email via Resend API
-    async function sendEmailViaResend(to, subject, htmlContent) {
+    // Send email via Supabase Edge Function
+    async function sendEmailViaResend(to, subject, htmlContent, replyTo = null) {
         try {
-            // Get settings from admin dashboard
-            const { data: settingsData, error: settingsError } = await window.supabaseClient
-                .from('settings')
-                .select('value')
-                .eq('key', 'adminSettings')
-                .single();
+            // Get Supabase URL from client
+            const supabaseUrl = window.supabaseClient.supabaseUrl;
+            const anonKey = window.supabaseClient.supabaseKey;
             
-            if (settingsError) throw settingsError;
-            
-            const settings = settingsData?.value || {};
-            const emailConfig = settings.integrations?.emailService || {};
-            
-            if (emailConfig.provider !== 'resend' || !emailConfig.apiKey) {
-                console.log('Email not configured, skipping automated email');
-                return;
-            }
-            
-            const fromEmail = emailConfig.fromEmail || 'noreply@opservesafetygroup.com';
-            
-            const response = await fetch('https://api.resend.com/emails', {
+            // Call the edge function
+            const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${emailConfig.apiKey}`,
+                    'Authorization': `Bearer ${anonKey}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    from: `OpServe Safety Group <${fromEmail}>`,
-                    to: [to],
+                    to: to,
                     subject: subject,
-                    html: htmlContent
+                    html: htmlContent,
+                    replyTo: replyTo
                 })
             });
             
+            const data = await response.json();
+            
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Failed to send email');
+                throw new Error(data.error || 'Failed to send email');
             }
             
-            return await response.json();
+            return data;
         } catch (error) {
             console.error('Email send error:', error);
             // Don't throw - we don't want to fail the submission if email fails
