@@ -159,7 +159,7 @@ function updateStats(applications) {
     const stats = {
         total: applications.length,
         new: applications.filter(app => app.status === 'new').length,
-        review: applications.filter(app => app.status === 'review').length,
+        review: applications.filter(app => app.status === 'under_review').length,
         approved: applications.filter(app => app.status === 'approved').length
     };
     
@@ -296,8 +296,18 @@ function viewApplication(id) {
 
 // Update application status
 async function updateApplicationStatus(id, newStatus) {
-    // Validate status
-    if (!['new', 'review', 'approved', 'denied', 'onboarded'].includes(newStatus)) {
+    // Map UI status values to database values
+    const statusMap = {
+        'new': 'new',
+        'review': 'under_review',
+        'approved': 'approved',
+        'denied': 'rejected',
+        'onboarded': 'onboarded'
+    };
+    
+    const dbStatus = statusMap[newStatus] || newStatus;
+    
+    if (!Object.values(statusMap).includes(dbStatus)) {
         return;
     }
     
@@ -306,7 +316,7 @@ async function updateApplicationStatus(id, newStatus) {
         const { error } = await window.supabaseClient
             .from('applications')
             .update({ 
-                status: newStatus,
+                status: dbStatus,
                 updated_at: new Date().toISOString()
             })
             .eq('id', id);
@@ -388,7 +398,13 @@ function filterApplications(status) {
     if (status === 'all') {
         renderApplications(window.allApplications);
     } else {
-        const filtered = window.allApplications.filter(app => app.status === status);
+        // Map UI filter values to database values
+        const statusMap = {
+            'review': 'under_review',
+            'denied': 'rejected'
+        };
+        const dbStatus = statusMap[status] || status;
+        const filtered = window.allApplications.filter(app => app.status === dbStatus);
         renderApplications(filtered);
     }
 }
@@ -425,8 +441,10 @@ function formatStatus(status) {
     const statusMap = {
         'new': 'New',
         'review': 'Under Review',
+        'under_review': 'Under Review',  // Database value
         'approved': 'Approved',
         'denied': 'Denied',
+        'rejected': 'Denied',  // Database value
         'onboarded': 'Onboarded'
     };
     return statusMap[status] || status;

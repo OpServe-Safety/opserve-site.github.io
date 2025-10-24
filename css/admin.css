@@ -440,7 +440,8 @@
     color: #1976d2;
 }
 
-.status-review {
+.status-review,
+.status-under_review {
     background: #fff3e0;
     color: #f57c00;
 }
@@ -450,7 +451,8 @@
     color: #388e3c;
 }
 
-.status-denied {
+.status-denied,
+.status-rejected {
     background: #ffebee;
     color: #d32f2f;
 }
