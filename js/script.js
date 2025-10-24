@@ -1,3 +1,40 @@
+// ===== INPUT FORMATTING UTILITIES =====
+
+// Format phone number to (XXX) XXX-XXXX
+function formatPhoneNumber(value) {
+    if (!value) return value;
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+    
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 7) {
+        return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    }
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+}
+
+// Capitalize name properly (First letter of each word)
+function capitalizeName(value) {
+    return value.replace(/\b\w/g, char => char.toUpperCase());
+}
+
+// Format email to lowercase
+function formatEmail(value) {
+    return value.toLowerCase().trim();
+}
+
+// Validate email format
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Validate phone number (must have 10 digits)
+function isValidPhone(phone) {
+    const digits = phone.replace(/[^\d]/g, '');
+    return digits.length === 10;
+}
+
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Debug: Log when the script loads
@@ -10,6 +47,60 @@ document.addEventListener('DOMContentLoaded', function() {
     const applicationForm = document.getElementById('applicationForm');
     const fileInput = document.getElementById('resume');
     const fileNameDisplay = document.getElementById('fileName');
+    
+    // ===== APPLY INPUT FORMATTING =====
+    
+    // Phone number formatting
+    const phoneInputs = document.querySelectorAll('input[type="tel"]');
+    phoneInputs.forEach(input => {
+        input.addEventListener('input', function(e) {
+            const formatted = formatPhoneNumber(e.target.value);
+            e.target.value = formatted;
+        });
+        
+        // Add validation on blur
+        input.addEventListener('blur', function(e) {
+            if (e.target.value && !isValidPhone(e.target.value)) {
+                e.target.style.borderColor = '#dc3545';
+                e.target.setCustomValidity('Please enter a valid 10-digit phone number');
+            } else {
+                e.target.style.borderColor = '';
+                e.target.setCustomValidity('');
+            }
+        });
+    });
+    
+    // Name fields formatting (capitalize)
+    const nameInputs = document.querySelectorAll('input[id*="Name"], input[name*="Name"]');
+    nameInputs.forEach(input => {
+        input.addEventListener('blur', function(e) {
+            e.target.value = capitalizeName(e.target.value);
+        });
+    });
+    
+    // Email formatting and validation
+    const emailInputs = document.querySelectorAll('input[type="email"]');
+    emailInputs.forEach(input => {
+        input.addEventListener('blur', function(e) {
+            e.target.value = formatEmail(e.target.value);
+            
+            if (e.target.value && !isValidEmail(e.target.value)) {
+                e.target.style.borderColor = '#dc3545';
+                e.target.setCustomValidity('Please enter a valid email address');
+            } else {
+                e.target.style.borderColor = '';
+                e.target.setCustomValidity('');
+            }
+        });
+    });
+    
+    // Middle initial - limit to 1 character and capitalize
+    const middleInitialInput = document.getElementById('middleInitial');
+    if (middleInitialInput) {
+        middleInitialInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase().slice(0, 1);
+        });
+    }
     
     // Debug: Log elements
     console.log('Modal:', modal);
