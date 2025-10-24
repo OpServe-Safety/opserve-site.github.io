@@ -3461,6 +3461,12 @@ function downloadQuotePDF(id) {
                     border-bottom: 3px solid #e43b04;
                 }
                 
+                .logo {
+                    width: 80px;
+                    height: auto;
+                    margin-bottom: 15px;
+                }
+                
                 .company-info h1 {
                     color: #e43b04;
                     font-size: 28px;
@@ -3600,6 +3606,7 @@ function downloadQuotePDF(id) {
         <body>
             <div class="header">
                 <div class="company-info">
+                    <img src="images/osg-logo-big.jpg" alt="OpServe Safety Group" class="logo">
                     <h1>OpServe Safety Group</h1>
                     <p>Professional Security Services</p>
                 </div>
@@ -4462,7 +4469,7 @@ async function uploadWebsiteImage(section, field, file, inputElement) {
         
         // Upload to Supabase Storage
         const { data, error: uploadError } = await window.supabaseClient.storage
-            .from('resumes')
+            .from('website-images')
             .upload(fileName, file, {
                 cacheControl: '3600',
                 upsert: true
@@ -4472,7 +4479,7 @@ async function uploadWebsiteImage(section, field, file, inputElement) {
         
         // Get public URL
         const { data: { publicUrl } } = window.supabaseClient.storage
-            .from('resumes')
+            .from('website-images')
             .getPublicUrl(fileName);
         
         // Update website content with new image URL
