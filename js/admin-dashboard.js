@@ -996,12 +996,23 @@ function renderSettingsView() {
                 </div>
                 
                 <div class="setting-row">
-                    <label class="setting-label-full">Background Image URL</label>
-                    <input type="text" id="heroImage" value="${settings.websiteContent.hero.backgroundImage}" 
-                           onchange="updateWebsiteContent('hero', 'backgroundImage', this.value)"
-                           placeholder="images/hero-bg.jpg"
-                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
-                    <small style="display: block; color: #6c757d; margin-top: 5px;">Use a relative path or full URL</small>
+                    <label class="setting-label-full">Background Image</label>
+                    <div style="display: flex; gap: 15px; align-items: start;">
+                        <div style="flex: 1;">
+                            <input type="file" id="heroImageFile" accept="image/*" 
+                                   onchange="uploadWebsiteImage('hero', 'backgroundImage', this.files[0], this)"
+                                   style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <small style="display: block; color: #6c757d; margin-top: 5px;">Upload a new background image (JPG, PNG, WebP)</small>
+                            <div id="heroImageUploadStatus" style="margin-top: 10px; font-size: 0.9rem;"></div>
+                        </div>
+                        ${settings.websiteContent.hero.backgroundImage ? `
+                        <div style="width: 150px;">
+                            <img src="${settings.websiteContent.hero.backgroundImage}" alt="Current hero image" 
+                                 style="width: 100%; height: auto; border-radius: 8px; border: 2px solid #e0e0e0;">
+                            <small style="display: block; color: #6c757d; margin-top: 5px; text-align: center;">Current image</small>
+                        </div>
+                        ` : ''}
+                    </div>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -4001,6 +4012,64 @@ async function testSupabaseConnection() {
 }
 
 // ===== WEBSITE CONTENT SETTINGS =====
+
+async function uploadWebsiteImage(section, field, file, inputElement) {
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+        alert('❌ Please select an image file');
+        return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('❌ Image must be less than 5MB');
+        return;
+    }
+    
+    const statusDiv = document.getElementById(`${section}ImageUploadStatus`);
+    statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    statusDiv.style.color = '#666';
+    
+    try {
+        // Create a unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `website/${section}-${field}-${Date.now()}.${fileExt}`;
+        
+        // Upload to Supabase Storage
+        const { data, error: uploadError } = await window.supabaseClient.storage
+            .from('resumes')
+            .upload(fileName, file, {
+                cacheControl: '3600',
+                upsert: true
+            });
+        
+        if (uploadError) throw uploadError;
+        
+        // Get public URL
+        const { data: { publicUrl } } = window.supabaseClient.storage
+            .from('resumes')
+            .getPublicUrl(fileName);
+        
+        // Update website content with new image URL
+        await updateWebsiteContent(section, field, publicUrl);
+        
+        statusDiv.innerHTML = '<i class="fas fa-check" style="color: #28a745;"></i> Image uploaded successfully!';
+        statusDiv.style.color = '#28a745';
+        
+        // Refresh the settings view to show new image
+        setTimeout(() => {
+            renderSettingsView();
+        }, 1500);
+        
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        statusDiv.innerHTML = '<i class="fas fa-times" style="color: #dc3545;"></i> Upload failed: ' + error.message;
+        statusDiv.style.color = '#dc3545';
+        inputElement.value = ''; // Reset file input
+    }
+}
 
 async function updateWebsiteContent(section, field, value) {
     try {
