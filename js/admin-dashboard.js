@@ -3407,7 +3407,7 @@ function viewQuoteDetail(id) {
                class="btn btn-secondary" style="margin: 8px; text-decoration: none;">
                 <i class="fas fa-envelope"></i> Email Client
             </a>
-            <button class="btn btn-secondary" onclick="alert('PDF download feature coming soon!')" style="margin: 8px;">
+            <button class="btn btn-secondary" onclick="downloadQuotePDF('${quote.id}')" style="margin: 8px;">
                 <i class="fas fa-file-pdf"></i> Download PDF
             </button>
         </div>
@@ -3417,6 +3417,296 @@ function viewQuoteDetail(id) {
     setTimeout(() => {
         modal.classList.add('active');
     }, 10);
+}
+
+// Download quote as PDF
+function downloadQuotePDF(id) {
+    const quote = allQuotes.find(q => q.id === id);
+    if (!quote) return;
+    
+    const eventDate = new Date(quote.details.eventDate);
+    const createdDate = new Date(quote.createdAt);
+    const validUntil = new Date(quote.terms.validUntil);
+    
+    // Create a new window for PDF
+    const printWindow = window.open('', '_blank');
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Quote ${quote.quoteNumber} - OpServe Safety Group</title>
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                
+                body {
+                    font-family: 'Arial', sans-serif;
+                    padding: 40px;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                
+                .header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 40px;
+                    padding-bottom: 20px;
+                    border-bottom: 3px solid #e43b04;
+                }
+                
+                .company-info h1 {
+                    color: #e43b04;
+                    font-size: 28px;
+                    margin-bottom: 5px;
+                }
+                
+                .company-info p {
+                    color: #666;
+                    font-size: 14px;
+                }
+                
+                .quote-number {
+                    text-align: right;
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #333;
+                }
+                
+                .info-section {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 30px;
+                    margin-bottom: 30px;
+                }
+                
+                .info-block h3 {
+                    color: #666;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    margin-bottom: 10px;
+                    letter-spacing: 1px;
+                }
+                
+                .info-block p {
+                    margin: 5px 0;
+                    font-size: 14px;
+                }
+                
+                .service-section {
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin-bottom: 30px;
+                }
+                
+                .service-section h2 {
+                    color: #e43b04;
+                    margin-bottom: 15px;
+                    font-size: 20px;
+                }
+                
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
+                }
+                
+                th {
+                    background: #f5f5f5;
+                    text-align: left;
+                    padding: 12px;
+                    font-weight: 600;
+                    border-bottom: 2px solid #e43b04;
+                }
+                
+                td {
+                    padding: 12px;
+                    border-bottom: 1px solid #e0e0e0;
+                }
+                
+                .text-right {
+                    text-align: right;
+                }
+                
+                .total-section {
+                    margin-top: 30px;
+                    padding-top: 20px;
+                    border-top: 2px solid #e0e0e0;
+                }
+                
+                .total-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 0;
+                    font-size: 16px;
+                }
+                
+                .total-row.final {
+                    border-top: 3px solid #e43b04;
+                    padding-top: 15px;
+                    margin-top: 10px;
+                    font-size: 20px;
+                    font-weight: bold;
+                    color: #e43b04;
+                }
+                
+                .terms-section {
+                    margin-top: 30px;
+                    padding: 15px;
+                    background: #fff5f0;
+                    border-left: 4px solid #e43b04;
+                    border-radius: 4px;
+                }
+                
+                .terms-section h3 {
+                    margin-bottom: 10px;
+                    color: #333;
+                }
+                
+                .footer {
+                    margin-top: 50px;
+                    padding-top: 20px;
+                    border-top: 1px solid #e0e0e0;
+                    text-align: center;
+                    color: #666;
+                    font-size: 12px;
+                }
+                
+                .status-badge {
+                    display: inline-block;
+                    padding: 4px 12px;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: 600;
+                }
+                
+                .status-draft { background: #fef3cd; color: #856404; }
+                .status-sent { background: #d1ecf1; color: #0c5460; }
+                .status-accepted { background: #d4edda; color: #155724; }
+                .status-declined { background: #f8d7da; color: #721c24; }
+                
+                @media print {
+                    body { padding: 20px; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="company-info">
+                    <h1>OpServe Safety Group</h1>
+                    <p>Professional Security Services</p>
+                </div>
+                <div class="quote-number">
+                    QUOTE #${quote.quoteNumber}
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-block">
+                    <h3>Client Information</h3>
+                    <p><strong>${quote.clientName}</strong></p>
+                    <p>${quote.clientEmail}</p>
+                    ${quote.clientPhone ? `<p>${quote.clientPhone}</p>` : ''}
+                </div>
+                <div class="info-block" style="text-align: right;">
+                    <h3>Quote Details</h3>
+                    <p><strong>Date:</strong> ${createdDate.toLocaleDateString()}</p>
+                    <p><strong>Valid Until:</strong> ${validUntil.toLocaleDateString()}</p>
+                    <p class="status-badge status-${quote.status}">${quote.status.toUpperCase()}</p>
+                </div>
+            </div>
+            
+            <div class="service-section">
+                <h2>${quote.serviceName}</h2>
+                <p><strong>Event Date:</strong> ${eventDate.toLocaleDateString()}</p>
+                <p><strong>Duration:</strong> ${quote.details.duration} hours</p>
+                ${quote.details.venueSize > 0 ? `<p><strong>Venue Size:</strong> ${quote.details.venueSize.toLocaleString()} people</p>` : ''}
+            </div>
+            
+            <h3 style="margin-bottom: 15px;">Personnel</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${Object.entries(quote.details.personnel).map(([key, pos]) => `
+                        <tr>
+                            <td>${pos.label} (${pos.count} × $${pos.rate}/hr × ${quote.details.duration}hrs)</td>
+                            <td class="text-right">$${(pos.count * pos.rate * quote.details.duration).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            
+            ${quote.pricing.addonsCost > 0 && quote.details.addons && quote.details.addons.length > 0 ? `
+            <h3 style="margin-bottom: 15px; margin-top: 30px;">Additional Services</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${quote.details.addons.map(addon => {
+                        const addonName = addon.name || addon.label || addon.description || 'Additional Service';
+                        const addonPrice = addon.price || addon.amount || 0;
+                        return `
+                        <tr>
+                            <td>${addonName}</td>
+                            <td class="text-right">$${parseFloat(addonPrice).toFixed(2)}</td>
+                        </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+            ` : ''}
+            
+            <div class="total-section">
+                <div class="total-row">
+                    <span><strong>Subtotal:</strong></span>
+                    <span>$${quote.pricing.subtotal.toFixed(2)}</span>
+                </div>
+                <div class="total-row">
+                    <span>Tax (${((quote.pricing.taxRate || 0.06) * 100).toFixed(2)}%${quote.pricing.taxState ? ' - ' + quote.pricing.taxState : ''}):</span>
+                    <span>$${quote.pricing.tax.toFixed(2)}</span>
+                </div>
+                <div class="total-row final">
+                    <span>TOTAL:</span>
+                    <span>$${quote.pricing.total.toFixed(2)}</span>
+                </div>
+            </div>
+            
+            <div class="terms-section">
+                <h3>Payment Terms</h3>
+                <p>${quote.terms.paymentTerms}</p>
+            </div>
+            
+            <div class="footer">
+                <p>Thank you for considering OpServe Safety Group for your security needs.</p>
+                <p>This quote is valid until ${validUntil.toLocaleDateString()}</p>
+            </div>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Wait for content to load, then trigger print
+    setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+    }, 500);
 }
 
 // Open quote builder from a contact/message
