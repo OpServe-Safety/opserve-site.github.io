@@ -643,6 +643,23 @@ async function initializeSettings() {
         localStorage.setItem('adminSettings', JSON.stringify(defaultSettings));
         // Sync website content to separate key for easy access
         localStorage.setItem('websiteContent', JSON.stringify(defaultSettings.websiteContent));
+        
+        // Save positions to Supabase if not already there
+        if (!savedPositions) {
+            try {
+                await window.supabaseClient
+                    .from('settings')
+                    .upsert({
+                        key: 'positions',
+                        value: defaultSettings.positions
+                    }, {
+                        onConflict: 'key'
+                    });
+                console.log('Initial positions saved to Supabase');
+            } catch (error) {
+                console.error('Error saving initial positions:', error);
+            }
+        }
     } else {
         // Merge existing settings with defaults (in case new properties were added)
         const settings = JSON.parse(existingSettings);
@@ -679,6 +696,23 @@ async function initializeSettings() {
         localStorage.setItem('adminSettings', JSON.stringify(mergedSettings));
         // Sync website content to separate key for easy access
         localStorage.setItem('websiteContent', JSON.stringify(mergedSettings.websiteContent));
+        
+        // Save positions to Supabase if not already there
+        if (!savedPositions) {
+            try {
+                await window.supabaseClient
+                    .from('settings')
+                    .upsert({
+                        key: 'positions',
+                        value: mergedSettings.positions
+                    }, {
+                        onConflict: 'key'
+                    });
+                console.log('Positions synced to Supabase');
+            } catch (error) {
+                console.error('Error syncing positions:', error);
+            }
+        }
     }
 }
 
