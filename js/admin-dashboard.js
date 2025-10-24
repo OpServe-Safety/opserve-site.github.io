@@ -2907,13 +2907,13 @@ function getServiceIcon(service) {
 // Get status badge HTML
 function getContactStatusBadge(status) {
     const badges = {
-        'new': '<span class="badge badge-new">New</span>',
-        'contacted': '<span class="badge badge-review">Contacted</span>',
-        'quote-sent': '<span class="badge badge-info">Quote Sent</span>',
-        'converted': '<span class="badge badge-approved">Converted</span>',
-        'not-interested': '<span class="badge badge-denied">Not Interested</span>'
+        'new': '<span class="status-badge status-new">New</span>',
+        'contacted': '<span class="status-badge status-review">Contacted</span>',
+        'quote-sent': '<span class="status-badge status-approved">Quote Sent</span>',
+        'converted': '<span class="status-badge status-approved">Converted</span>',
+        'not-interested': '<span class="status-badge status-denied">Not Interested</span>'
     };
-    return badges[status] || status;
+    return badges[status] || `<span class="status-badge">${status}</span>`;
 }
 
 // Setup event listeners for contacts
@@ -3464,13 +3464,13 @@ function renderQuotesTable(quotes) {
 // Get quote status badge
 function getQuoteStatusBadge(status) {
     const badges = {
-        'draft': '<span class="badge badge-info">Draft</span>',
-        'sent': '<span class="badge badge-review">Sent</span>',
-        'accepted': '<span class="badge badge-approved">Accepted</span>',
-        'rejected': '<span class="badge badge-denied">Rejected</span>',
-        'expired': '<span class="badge" style="background: #999;">Expired</span>'
+        'draft': '<span class="status-badge status-new">Draft</span>',
+        'sent': '<span class="status-badge status-review">Sent</span>',
+        'accepted': '<span class="status-badge status-approved">Accepted</span>',
+        'rejected': '<span class="status-badge status-denied">Rejected</span>',
+        'expired': '<span class="status-badge" style="background: #999;">Expired</span>'
     };
-    return badges[status] || status;
+    return badges[status] || `<span class="status-badge">${status}</span>`;
 }
 
 // Delete quote
