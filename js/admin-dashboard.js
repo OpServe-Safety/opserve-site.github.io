@@ -3375,7 +3375,7 @@ function calculateQuoteTotal() {
 }
 
 // Create quote from form
-function createQuote(event, contactId) {
+async function createQuote(event, contactId) {
     event.preventDefault();
     
     const contact = allContacts.find(c => c.id === contactId);
@@ -3440,61 +3440,88 @@ function createQuote(event, contactId) {
     const validUntil = new Date();
     validUntil.setDate(validUntil.getDate() + settings.quoteSettings.validityDays);
     
-    // Create quote object
-    const newQuote = {
-        id: 'q' + (allQuotes.length + 1),
-        quoteNumber: quoteNumber,
-        contactId: contactId,
-        clientName: contact.company || contact.name,
-        clientEmail: contact.email,
+    // Build line items for database
+    const lineItems = [];
+    Object.entries(personnel).forEach(([key, pos]) => {
+        lineItems.push({
+            type: 'personnel',
+            description: `${pos.label} (${pos.count} x ${duration} hrs)`,
+            quantity: pos.count,
+            rate: pos.rate,
+            hours: duration,
+            amount: pos.count * pos.rate * duration
+        });
+    });
+    
+    addons.forEach(addonId => {
+        const addon = template.addons.find(a => a.id === addonId);
+        if (addon) {
+            lineItems.push({
+                type: 'addon',
+                description: addon.label,
+                quantity: 1,
+                rate: addon.price,
+                hours: 1,
+                amount: addon.price
+            });
+        }
+    });
+    
+    // Create quote object for database
+    const quoteData = {
+        quote_number: quoteNumber,
+        contact_id: contactId,
+        client_name: contact.name,
+        client_email: contact.email,
+        client_phone: contact.phone || '',
+        client_state: clientState,
         service: contact.service,
-        serviceName: contact.serviceName,
-        details: {
-            eventDate: eventDate,
-            duration: duration,
-            venueSize: venueSize,
-            personnel: personnel,
-            addons: addons
-        },
-        pricing: {
-            personnelCost: personnelCost,
-            addonsCost: addonsCost,
-            subtotal: subtotal,
-            tax: tax,
-            taxRate: taxRateUsed,
-            taxState: clientState,
-            total: total
-        },
-        terms: {
-            paymentTerms: paymentTerms,
-            validUntil: validUntil.toISOString().split('T')[0]
-        },
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        sentAt: null,
-        viewedAt: null,
-        notes: []
+        event_date: eventDate || null,
+        event_location: '',
+        event_duration: duration,
+        expected_attendance: venueSize || null,
+        line_items: lineItems,
+        subtotal: subtotal,
+        tax: tax,
+        total: total,
+        status: 'draft',
+        valid_until: validUntil.toISOString().split('T')[0],
+        notes: paymentTerms
     };
     
-    // Add to quotes array
-    allQuotes.push(newQuote);
-    
-    // Close builder modal
-    document.getElementById('quoteBuilderModal').style.display = 'none';
-    document.getElementById('quoteBuilderModal').classList.remove('active');
-    
-    // Show success notification
-    showSaveNotification(`Quote ${quoteNumber} created successfully!`);
-    
-    // If on quotes view, refresh it
-    if (currentView === 'quotes') {
-        renderQuotesView();
-    } else {
-        // Switch to quotes view and show the new quote
-        switchView('quotes');
-        setTimeout(() => {
-            viewQuoteDetail(newQuote.id);
-        }, 500);
+    try {
+        // Save to Supabase
+        const { data, error } = await window.supabaseClient
+            .from('quotes')
+            .insert([quoteData])
+            .select()
+            .single();
+        
+        if (error) throw error;
+        
+        // Add to local array
+        allQuotes.push(data);
+        
+        // Close builder modal
+        document.getElementById('quoteBuilderModal').style.display = 'none';
+        document.getElementById('quoteBuilderModal').classList.remove('active');
+        
+        // Show success notification
+        showSaveNotification(`Quote ${quoteNumber} created successfully!`);
+        
+        // If on quotes view, refresh it
+        if (currentView === 'quotes') {
+            renderQuotesView();
+        } else {
+            // Switch to quotes view and show the new quote
+            switchView('quotes');
+            setTimeout(() => {
+                viewQuoteDetail(data.id);
+            }, 500);
+        }
+    } catch (error) {
+        console.error('Error creating quote:', error);
+        showError('Failed to create quote: ' + error.message);
     }
 }
 
