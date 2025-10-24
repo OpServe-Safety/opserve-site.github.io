@@ -328,29 +328,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 description: jobDescriptions[index]
             }));
             
-            const applicationData = {
-                name: fullName,
-                email: formData.get('email'),
-                phone: formData.get('phone'),
-                position: formData.get('position'),
-                other_position: formData.get('otherPosition') || null,
-                experience: formData.get('experience'),
-                work_history: workHistory,
-                file_urls: selectedFiles.map(f => f.name),
-                status: 'new'
-            };
-            
             try {
-                // Save to Supabase
+                // Step 1: Upload files to Supabase Storage
+                const uploadedFileUrls = [];
+                const timestamp = Date.now();
+                
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${timestamp}_${i}_${file.name}`;
+                    const filePath = `${fileName}`;
+                    
+                    const { data: uploadData, error: uploadError } = await window.supabaseClient.storage
+                        .from('applications')
+                        .upload(filePath, file);
+                    
+                    if (uploadError) {
+                        console.error('File upload error:', uploadError);
+                        throw new Error('Failed to upload file: ' + file.name);
+                    }
+                    
+                    // Get public URL
+                    const { data: { publicUrl } } = window.supabaseClient.storage
+                        .from('applications')
+                        .getPublicUrl(filePath);
+                    
+                    uploadedFileUrls.push({
+                        name: file.name,
+                        url: publicUrl,
+                        path: filePath
+                    });
+                }
+                
+                // Step 2: Save application to database with file URLs
+                const applicationData = {
+                    name: fullName,
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    position: formData.get('position'),
+                    other_position: formData.get('otherPosition') || null,
+                    experience: formData.get('experience'),
+                    work_history: workHistory,
+                    file_urls: uploadedFileUrls,
+                    status: 'new'
+                };
+                
                 const { data, error } = await window.supabaseClient
                     .from('applications')
                     .insert([applicationData]);
                 
                 if (error) throw error;
-                
-                // TODO: Upload files to Supabase Storage and update application with file URLs
-                console.log('Application submitted with', selectedFiles.length, 'file(s)');
-                console.log('Files:', selectedFiles.map(f => f.name));
                 
                 // Show success message
                 alert('Thank you for your application! We will review your information and get back to you soon.');

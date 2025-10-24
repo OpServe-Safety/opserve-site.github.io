@@ -134,6 +134,7 @@ async function loadApplications() {
             other_position: app.other_position,
             experience: app.experience,
             workHistory: app.work_history || [],
+            file_urls: app.file_urls || [],
             status: app.status || 'new',
             createdAt: app.created_at,
             notes: app.notes
@@ -237,13 +238,29 @@ function viewApplication(id) {
                 <h3 style="margin-bottom: 15px;">Work History</h3>
                 ${application.workHistory.map(work => `
                     <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                        <div style="font-weight: 600; margin-bottom: 5px;">${work.position} at ${work.company}</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">${work.jobTitle} at ${work.company}</div>
                         <div style="color: #6c757d; font-size: 0.9rem; margin-bottom: 10px;">
                             ${work.startDate} - ${work.endDate || 'Present'}
                         </div>
                         <p style="margin: 0;">${work.description || ''}</p>
                     </div>
                 `).join('')}
+            </div>
+        ` : ''}
+        
+        ${application.file_urls && application.file_urls.length > 0 ? `
+            <div style="margin-bottom: 30px;">
+                <h3 style="margin-bottom: 15px;">Uploaded Files</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${application.file_urls.map(file => `
+                        <a href="${file.url}" target="_blank" rel="noopener noreferrer" 
+                           style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; transition: background 0.2s;">
+                            <i class="fas fa-file-${getFileIcon(file.name)}" style="color: var(--primary-color); font-size: 1.2rem;"></i>
+                            <span style="flex: 1;">${file.name}</span>
+                            <i class="fas fa-external-link-alt" style="color: #6c757d; font-size: 0.9rem;"></i>
+                        </a>
+                    `).join('')}
+                </div>
             </div>
         ` : ''}
         
@@ -350,6 +367,19 @@ function formatStatus(status) {
         'onboarded': 'Onboarded'
     };
     return statusMap[status] || status;
+}
+
+function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    switch(ext) {
+        case 'pdf':
+            return 'pdf';
+        case 'doc':
+        case 'docx':
+            return 'word';
+        default:
+            return 'alt';
+    }
 }
 
 function showSuccess(message) {
