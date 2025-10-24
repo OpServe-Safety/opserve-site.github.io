@@ -195,9 +195,6 @@ function renderApplications(applications) {
             </td>
             <td>
                 <div class="action-btns">
-                    <button class="btn-icon" onclick="event.stopPropagation(); viewApplication('${app.id}')" title="View Details">
-                        <i class="fas fa-eye"></i>
-                    </button>
                     <button class="btn-icon" onclick="event.stopPropagation(); deleteApplication('${app.id}')" title="Delete Application" style="color: #dc3545;">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -2803,7 +2800,7 @@ function renderContactsTable(contacts) {
         const serviceName = serviceNames[contact.service] || contact.service;
         
         return `
-            <tr>
+            <tr onclick="viewContactDetail('${contact.id}')" style="cursor: pointer;">
                 <td>
                     <strong>${contact.name}</strong>
                     <br><small style="color: #666;">${contact.state}</small>
@@ -2823,10 +2820,7 @@ function renderContactsTable(contacts) {
                 <td>${getContactStatusBadge(contact.status)}</td>
                 <td>
                     <div class="action-btns">
-                        <button class="btn-icon" onclick="viewContactDetail('${contact.id}')" title="View details">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn-icon" onclick="deleteContact('${contact.id}')" title="Delete Contact" style="color: #dc3545;">
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteContact('${contact.id}')" title="Delete Contact" style="color: #dc3545;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -3375,7 +3369,7 @@ function renderQuotesTable(quotes) {
         const eventDate = quote.details?.eventDate ? new Date(quote.details.eventDate) : null;
         
         return `
-            <tr>
+            <tr onclick="viewQuoteDetail('${quote.id}')" style="cursor: pointer;">
                 <td><strong>${quote.quoteNumber}</strong></td>
                 <td>
                     <strong>${quote.clientName}</strong><br>
@@ -3391,13 +3385,10 @@ function renderQuotesTable(quotes) {
                 <td>${getQuoteStatusBadge(quote.status)}</td>
                 <td>
                     <div class="action-btns">
-                        <button class="btn-icon" onclick="viewQuoteDetail('${quote.id}')" title="View quote">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn-icon" onclick="editQuote('${quote.id}')" title="Edit Quote" style="color: #2196F3;">
+                        <button class="btn-icon" onclick="event.stopPropagation(); editQuote('${quote.id}')" title="Edit Quote" style="color: #2196F3;">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-icon" onclick="deleteQuote('${quote.id}')" title="Delete Quote" style="color: #dc3545;">
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteQuote('${quote.id}')" title="Delete Quote" style="color: #dc3545;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
