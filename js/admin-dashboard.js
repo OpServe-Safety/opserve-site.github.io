@@ -3185,6 +3185,20 @@ function openQuoteBuilder(contactId) {
     const nextMonth = new Date(today);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     
+    // Parse service details from message
+    const serviceDetails = {};
+    if (contact.message && contact.message.includes('--- Service Details ---')) {
+        const detailsSection = contact.message.split('--- Service Details ---')[1];
+        const lines = detailsSection.split('\n');
+        lines.forEach(line => {
+            const match = line.match(/^(\w+):\s*(.+)$/);
+            if (match) {
+                const [, key, value] = match;
+                serviceDetails[key] = value.trim();
+            }
+        });
+    }
+    
     modalContent.innerHTML = `
         <h2 style="margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #e0e0e0;">Generate Quote</h2>
         
@@ -3212,19 +3226,19 @@ function openQuoteBuilder(contactId) {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: 600;">Event Date</label>
-                        <input type="date" id="eventDate" required 
+                        <input type="date" id="eventDate" value="${serviceDetails.eventDate || ''}" required 
                                style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: 600;">Duration (hours)</label>
-                        <input type="number" id="duration" value="${settings.quoteSettings.serviceDurations[contact.service]}" min="1" required 
+                        <input type="number" id="duration" value="${serviceDetails.eventDuration || settings.quoteSettings.serviceDurations[contact.service] || 8}" min="1" step="0.5" required 
                                style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;" 
                                onchange="calculateQuoteTotal()">
                     </div>
                 </div>
                 <div style="margin-top: 15px;">
                     <label style="display: block; margin-bottom: 5px; font-weight: 600;">Venue Size (optional)</label>
-                    <input type="number" id="venueSize" placeholder="Number of attendees" 
+                    <input type="number" id="venueSize" value="${serviceDetails.expectedAttendance || ''}" placeholder="Number of attendees" 
                            style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
                 </div>
             </div>
