@@ -1,12 +1,12 @@
 // Admin Dashboard - To be connected with Supabase later
 let currentView = 'analytics';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Check authentication
     checkAuth();
     
     // Initialize settings if not exist
-    initializeSettings();
+    await initializeSettings();
     
     // Load analytics view (default)
     renderAnalyticsView();
@@ -494,9 +494,25 @@ function getSampleApplications() {
 // ===== SETTINGS MANAGEMENT =====
 
 // Initialize default settings
-function initializeSettings() {
+async function initializeSettings() {
+    // Load positions from Supabase
+    let savedPositions = null;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('settings')
+            .select('value')
+            .eq('key', 'positions')
+            .single();
+        
+        if (!error && data) {
+            savedPositions = data.value;
+        }
+    } catch (error) {
+        console.log('No saved positions in database, using defaults');
+    }
+    
     const defaultSettings = {
-        positions: [
+        positions: savedPositions || [
             { value: 'admin', label: 'Admin', active: true },
             { value: 'event-staff', label: 'Event Staff', active: true },
             { value: 'agent', label: 'Agent', active: true },
@@ -1912,18 +1928,31 @@ function renderAnalyticsView() {
 }
 
 // Toggle position active state
-function togglePosition(positionValue) {
+async function togglePosition(positionValue) {
     const settings = JSON.parse(localStorage.getItem('adminSettings'));
     const position = settings.positions.find(p => p.value === positionValue);
     if (position) {
         position.active = !position.active;
         localStorage.setItem('adminSettings', JSON.stringify(settings));
         
-        // Auto-sync to website
-        const activePositions = settings.positions.filter(p => p.active);
-        localStorage.setItem('activePositions', JSON.stringify(activePositions));
-        
-        showSaveNotification('Position updated and synced to website!');
+        // Save to Supabase
+        try {
+            const { error } = await window.supabaseClient
+                .from('settings')
+                .upsert({
+                    key: 'positions',
+                    value: settings.positions
+                }, {
+                    onConflict: 'key'
+                });
+            
+            if (error) throw error;
+            
+            showSaveNotification('Position updated and synced!');
+        } catch (error) {
+            console.error('Error saving position:', error);
+            showError('Failed to save position settings');
+        }
     }
 }
 
@@ -1972,16 +2001,28 @@ function addNewPosition() {
     
     localStorage.setItem('adminSettings', JSON.stringify(settings));
     
-    // Clear input
-    input.value = '';
-    
-    // Auto-sync to website
-    const activePositions = settings.positions.filter(p => p.active);
-    localStorage.setItem('activePositions', JSON.stringify(activePositions));
-    
-    // Show success and re-render
-    showSaveNotification(`Position "${label}" added and synced to website!`);
-    renderSettingsView();
+    // Save to Supabase
+    window.supabaseClient
+        .from('settings')
+        .upsert({
+            key: 'positions',
+            value: settings.positions
+        }, {
+            onConflict: 'key'
+        })
+        .then(({ error }) => {
+            if (error) {
+                console.error('Error saving position:', error);
+                showError('Failed to save position');
+            } else {
+                // Clear input
+                input.value = '';
+                
+                // Show success and re-render
+                showSaveNotification(`Position "${label}" added and synced!`);
+                renderSettingsView();
+            }
+        });
 }
 
 // Delete custom position
@@ -2000,12 +2041,24 @@ function deletePosition(positionValue) {
     settings.positions = settings.positions.filter(p => p.value !== positionValue);
     localStorage.setItem('adminSettings', JSON.stringify(settings));
     
-    // Auto-sync to website
-    const activePositions = settings.positions.filter(p => p.active);
-    localStorage.setItem('activePositions', JSON.stringify(activePositions));
-    
-    showSaveNotification('Position deleted and synced to website!');
-    renderSettingsView();
+    // Save to Supabase
+    window.supabaseClient
+        .from('settings')
+        .upsert({
+            key: 'positions',
+            value: settings.positions
+        }, {
+            onConflict: 'key'
+        })
+        .then(({ error }) => {
+            if (error) {
+                console.error('Error deleting position:', error);
+                showError('Failed to delete position');
+            } else {
+                showSaveNotification('Position deleted and synced!');
+                renderSettingsView();
+            }
+        });
 }
 
 // Save position settings and sync to website
