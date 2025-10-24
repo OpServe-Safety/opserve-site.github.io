@@ -4331,10 +4331,14 @@ function calculateQuoteTotal() {
     const tax = subtotal * taxRate;
     const total = subtotal + tax;
     
-    // Update display
-    document.getElementById('quoteSubtotal').textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById('quoteTax').textContent = `$${tax.toFixed(2)}`;
-    document.getElementById('quoteTotal').textContent = `$${total.toFixed(2)}`;
+    // Update display - check which elements exist (create vs edit quote modals use different IDs)
+    const subtotalEl = document.getElementById('quoteSubtotal') || document.getElementById('quoteSummarySubtotal');
+    const taxEl = document.getElementById('quoteTax') || document.getElementById('quoteSummaryTax');
+    const totalEl = document.getElementById('quoteTotal') || document.getElementById('quoteSummaryTotal');
+    
+    if (subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+    if (taxEl) taxEl.textContent = `$${tax.toFixed(2)}`;
+    if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
 }
 
 // Create quote from form
