@@ -30,19 +30,35 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let positions = [];
             
-            if (!error && data) {
+            if (error) {
+                console.error('Error loading positions from Supabase:', error);
+                console.log('Using fallback positions');
+                // Fallback to default positions if database error
+                positions = [
+                    { value: 'admin', label: 'Admin', active: true },
+                    { value: 'event-staff', label: 'Event Staff', active: true },
+                    { value: 'agent', label: 'Agent', active: true },
+                    { value: 'safety-agent', label: 'Safety Agent', active: true },
+                    { value: 'safety-supervisor', label: 'Safety Supervisor', active: true },
+                    { value: 'manager', label: 'Manager', active: true },
+                    { value: 'other', label: 'Other', active: true }
+                ];
+            } else if (data && data.value) {
+                console.log('Positions loaded from Supabase:', data.value);
                 // Filter to only active positions
                 positions = data.value.filter(pos => pos.active);
+                console.log('Active positions:', positions);
             } else {
+                console.log('No positions found in database, using defaults');
                 // Fallback to default positions if nothing in database
                 positions = [
-                    { value: 'admin', label: 'Admin' },
-                    { value: 'event-staff', label: 'Event Staff' },
-                    { value: 'agent', label: 'Agent' },
-                    { value: 'safety-agent', label: 'Safety Agent' },
-                    { value: 'safety-supervisor', label: 'Safety Supervisor' },
-                    { value: 'manager', label: 'Manager' },
-                    { value: 'other', label: 'Other' }
+                    { value: 'admin', label: 'Admin', active: true },
+                    { value: 'event-staff', label: 'Event Staff', active: true },
+                    { value: 'agent', label: 'Agent', active: true },
+                    { value: 'safety-agent', label: 'Safety Agent', active: true },
+                    { value: 'safety-supervisor', label: 'Safety Supervisor', active: true },
+                    { value: 'manager', label: 'Manager', active: true },
+                    { value: 'other', label: 'Other', active: true }
                 ];
             }
             
