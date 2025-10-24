@@ -354,7 +354,16 @@ async function deleteApplication(id) {
 
 // Email applicant
 function emailApplicant(email) {
-    window.location.href = `mailto:${email}`;
+    if (!email) {
+        alert('No email address available for this applicant.');
+        return;
+    }
+    
+    // Create a temporary anchor element and click it
+    const mailtoLink = document.createElement('a');
+    mailtoLink.href = `mailto:${email}`;
+    mailtoLink.target = '_blank';
+    mailtoLink.click();
 }
 
 // Filter applications
