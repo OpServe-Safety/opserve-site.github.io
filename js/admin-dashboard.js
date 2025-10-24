@@ -3854,18 +3854,6 @@ async function changeAdminPassword() {
     const currentPassword = prompt('Enter current password:');
     if (!currentPassword) return;
     
-    const newPassword = prompt('Enter new password (min 8 characters):');
-    if (!newPassword || newPassword.length < 8) {
-        alert('❌ Password must be at least 8 characters long');
-        return;
-    }
-    
-    const confirmPassword = prompt('Confirm new password:');
-    if (newPassword !== confirmPassword) {
-        alert('❌ Passwords do not match');
-        return;
-    }
-    
     try {
         // Get current user
         const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
@@ -3875,7 +3863,7 @@ async function changeAdminPassword() {
             return;
         }
         
-        // Verify current password by attempting to sign in
+        // Verify current password FIRST before asking for new password
         const { error: signInError } = await window.supabaseClient.auth.signInWithPassword({
             email: user.email,
             password: currentPassword
@@ -3883,6 +3871,19 @@ async function changeAdminPassword() {
         
         if (signInError) {
             alert('❌ Current password is incorrect');
+            return;
+        }
+        
+        // Current password is correct, now ask for new password
+        const newPassword = prompt('Enter new password (min 8 characters):');
+        if (!newPassword || newPassword.length < 8) {
+            alert('❌ Password must be at least 8 characters long');
+            return;
+        }
+        
+        const confirmPassword = prompt('Confirm new password:');
+        if (newPassword !== confirmPassword) {
+            alert('❌ Passwords do not match');
             return;
         }
         
