@@ -585,6 +585,12 @@ async function initializeSettings() {
                 apiKey: '',
                 fromEmail: 'noreply@opservesafetygroup.com'
             },
+            gusto: {
+                enabled: false,
+                environment: 'sandbox', // sandbox or production
+                apiKey: '',
+                companyId: ''
+            },
             analytics: {
                 googleAnalyticsId: '',
                 enabled: false
@@ -1794,6 +1800,63 @@ async function renderSettingsView() {
                 <div class="setting-row" style="text-align: center;">
                     <button class="btn btn-primary" onclick="testEmailConnection()">
                         <i class="fas fa-paper-plane"></i> Test Email Connection
+                    </button>
+                </div>
+                
+                <!-- Gusto Payroll -->
+                <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 1.1rem;">
+                    <i class="fas fa-users" style="color: #e43b04;"></i> Gusto Payroll
+                </h3>
+                
+                <div class="setting-row">
+                    <label class="setting-toggle">
+                        <span class="setting-label">Enable Gusto Integration</span>
+                        <input type="checkbox" id="gustoEnabled" ${settings.integrations.gusto.enabled ? 'checked' : ''} 
+                               onchange="updateIntegrationSetting('gusto', 'enabled', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Automatically sync approved applicants to Gusto for onboarding
+                    </small>
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">Environment</label>
+                    <select id="gustoEnvironment" onchange="updateIntegrationSetting('gusto', 'environment', this.value)"
+                            style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="sandbox" ${settings.integrations.gusto.environment === 'sandbox' ? 'selected' : ''}>Sandbox (Testing)</option>
+                        <option value="production" ${settings.integrations.gusto.environment === 'production' ? 'selected' : ''}>Production</option>
+                    </select>
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-exclamation-triangle"></i> Use Sandbox for testing, Production for live data
+                    </small>
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">API Key</label>
+                    <input type="password" id="gustoApiKey" value="${settings.integrations.gusto.apiKey}" 
+                           onchange="updateIntegrationSetting('gusto', 'apiKey', this.value)"
+                           placeholder="Enter your Gusto API token"
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Get your API token from <a href="https://dev.gusto.com/" target="_blank">Gusto Developer Portal</a>
+                    </small>
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">Company ID</label>
+                    <input type="text" id="gustoCompanyId" value="${settings.integrations.gusto.companyId}" 
+                           onchange="updateIntegrationSetting('gusto', 'companyId', this.value)"
+                           placeholder="Enter your Gusto Company ID"
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-building"></i> Your company's unique identifier in Gusto
+                    </small>
+                </div>
+                
+                <div class="setting-row" style="text-align: center;">
+                    <button class="btn btn-primary" onclick="testGustoConnection()">
+                        <i class="fas fa-plug"></i> Test Gusto Connection
                     </button>
                 </div>
                 
@@ -5298,6 +5361,87 @@ async function testEmailConnection() {
             '• Email provider is set to "Resend"\n' +
             '• From email is verified in Resend\n' +
             '• API key has send permissions'
+        );
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.style.background = '';
+            button.disabled = false;
+        }, 3000);
+    }
+}
+
+async function testGustoConnection() {
+    const button = event.target.closest('button');
+    const originalHTML = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing Connection...';
+    
+    try {
+        // Get current settings
+        const settings = JSON.parse(localStorage.getItem('adminSettings'));
+        const gustoConfig = settings.integrations.gusto;
+        
+        if (!gustoConfig.apiKey) {
+            throw new Error('API Key is required');
+        }
+        
+        if (!gustoConfig.companyId) {
+            throw new Error('Company ID is required');
+        }
+        
+        // Determine API base URL based on environment
+        const baseUrl = gustoConfig.environment === 'production' 
+            ? 'https://api.gusto.com'
+            : 'https://api.gusto-demo.com';
+        
+        // Test API connection by fetching company info
+        const response = await fetch(`${baseUrl}/v1/companies/${gustoConfig.companyId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${gustoConfig.apiKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || `Failed to connect (${response.status})`);
+        }
+        
+        const companyData = await response.json();
+        
+        // Success
+        button.innerHTML = '<i class="fas fa-check"></i> Connected!';
+        button.style.background = '#4caf50';
+        
+        alert(
+            '✅ Gusto Connection Successful!\n\n' +
+            `🏢 Company: ${companyData.name || 'Unknown'}\n` +
+            `🌍 Environment: ${gustoConfig.environment.toUpperCase()}\n` +
+            `🆔 Company ID: ${gustoConfig.companyId}\n\n` +
+            'Connection verified! You can now sync approved applicants to Gusto.'
+        );
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.style.background = '';
+            button.disabled = false;
+        }, 3000);
+        
+    } catch (error) {
+        console.error('Gusto test failed:', error);
+        button.innerHTML = '<i class="fas fa-times"></i> Failed';
+        button.style.background = '#dc3545';
+        
+        alert(
+            '❌ Gusto Connection Failed\n\n' +
+            `Error: ${error.message}\n\n` +
+            'Please check:\n' +
+            '• API Key is correct and valid\n' +
+            '• Company ID matches your Gusto account\n' +
+            '• Environment is set correctly (Sandbox/Production)\n' +
+            '• API token has necessary permissions'
         );
         
         setTimeout(() => {
