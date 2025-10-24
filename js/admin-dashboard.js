@@ -796,6 +796,14 @@ function renderApplicationsView() {
         
         <!-- Filters -->
         <div class="filters-bar">
+            <!-- Mobile Filter Button -->
+            <button class="mobile-filter-btn" onclick="openFilterModal('applications')">
+                <i class="fas fa-filter"></i>
+                <span>Filters</span>
+                <span class="badge" id="appFilterBadge">All</span>
+            </button>
+            
+            <!-- Desktop Filter Buttons -->
             <div class="filter-group">
                 <button class="filter-btn active" data-status="all">All</button>
                 <button class="filter-btn" data-status="new">New</button>
@@ -810,6 +818,44 @@ function renderApplicationsView() {
                     id="searchInput" 
                     placeholder="Search by name, email, or position..."
                 >
+            </div>
+        </div>
+        
+        <!-- Filter Modal -->
+        <div class="filter-modal" id="applicationsFilterModal">
+            <div class="filter-modal-content">
+                <div class="filter-modal-header">
+                    <h3><i class="fas fa-filter"></i> Filter Applications</h3>
+                    <button class="filter-modal-close" onclick="closeFilterModal('applications')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="filter-modal-body">
+                    <div class="filter-modal-option active" onclick="selectMobileFilter('applications', 'all', this)">
+                        <input type="radio" name="appFilter" value="all" checked>
+                        <label>All Applications</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('applications', 'new', this)">
+                        <input type="radio" name="appFilter" value="new">
+                        <label>New</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('applications', 'review', this)">
+                        <input type="radio" name="appFilter" value="review">
+                        <label>Under Review</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('applications', 'approved', this)">
+                        <input type="radio" name="appFilter" value="approved">
+                        <label>Approved</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('applications', 'denied', this)">
+                        <input type="radio" name="appFilter" value="denied">
+                        <label>Denied</label>
+                    </div>
+                    <div class="filter-modal-option" onclick="selectMobileFilter('applications', 'onboarded', this)">
+                        <input type="radio" name="appFilter" value="onboarded">
+                        <label>Onboarded</label>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -4245,3 +4291,91 @@ function getActivePositions() {
 
 // Note: Supabase integration is now fully implemented throughout the dashboard
 // Applications, Contacts, and Quotes all use Supabase for CRUD operations
+
+// ===== MOBILE FILTER MODAL FUNCTIONS =====
+
+// Open filter modal
+function openFilterModal(type) {
+    const modal = document.getElementById(`${type}FilterModal`);
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+// Close filter modal
+function closeFilterModal(type) {
+    const modal = document.getElementById(`${type}FilterModal`);
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Select filter in mobile modal
+function selectMobileFilter(type, status, element) {
+    // Update active state in modal
+    const modal = document.getElementById(`${type}FilterModal`);
+    if (modal) {
+        modal.querySelectorAll('.filter-modal-option').forEach(option => {
+            option.classList.remove('active');
+        });
+        element.classList.add('active');
+        
+        // Update radio button
+        const radio = element.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+    }
+    
+    // Update badge text
+    const badgeText = status === 'all' ? 'All' : 
+                     status === 'new' ? 'New' :
+                     status === 'review' ? 'Review' :
+                     status === 'approved' ? 'Approved' :
+                     status === 'denied' ? 'Denied' :
+                     status === 'onboarded' ? 'Onboarded' :
+                     status === 'contacted' ? 'Contacted' :
+                     status === 'quote-sent' ? 'Quote Sent' :
+                     status === 'converted' ? 'Converted' :
+                     status === 'not-interested' ? 'Not Interested' :
+                     status === 'pending' ? 'Pending' :
+                     status === 'sent' ? 'Sent' :
+                     status === 'accepted' ? 'Accepted' :
+                     status === 'declined' ? 'Declined' : status;
+    
+    const badgeId = type === 'applications' ? 'appFilterBadge' :
+                    type === 'contacts' ? 'contactFilterBadge' :
+                    'quoteFilterBadge';
+    
+    const badge = document.getElementById(badgeId);
+    if (badge) badge.textContent = badgeText;
+    
+    // Apply the filter based on type
+    if (type === 'applications') {
+        filterApplications(status);
+        // Also update desktop button states
+        document.querySelectorAll('.filter-group .filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.status === status);
+        });
+    } else if (type === 'contacts') {
+        filterContacts(status);
+        // Also update desktop button states
+        document.querySelectorAll('.filter-group .filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.status === status);
+        });
+    } else if (type === 'quotes') {
+        filterQuotes(status);
+        // Also update desktop button states
+        document.querySelectorAll('.filter-group .filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.status === status);
+        });
+    }
+    
+    // Close the modal
+    closeFilterModal(type);
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    if (event.target.classList.contains('filter-modal')) {
+        event.target.classList.remove('active');
+    }
+});
