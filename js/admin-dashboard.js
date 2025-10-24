@@ -3979,7 +3979,7 @@ function editQuote(quoteId) {
     
     // Pre-fill personnel quantities and rates from existing quote
     const personnelHTML = settings.positions.filter(pos => pos.value !== 'other').map(position => {
-        const existingPersonnel = quote.personnel?.[position.value];
+        const existingPersonnel = quote.details?.personnel?.[position.value];
         const qty = existingPersonnel?.count || 0;
         const rate = existingPersonnel?.rate || settings.quoteSettings.positionRates[position.value] || 35;
         
@@ -4004,15 +4004,19 @@ function editQuote(quoteId) {
         `;
     }).join('');
     
-    // Check which addons were selected
+    // Check which addons were selected - addons is an array of {name, price} objects
     const selectedAddons = quote.details?.addons || [];
-    const addonsHTML = (template.addons || []).map((addon, index) => `
-        <label style="display: flex; align-items: center; padding: 10px; background: #f8f9fa; margin-bottom: 10px; border-radius: 8px; cursor: pointer;">
-            <input type="checkbox" id="addon_${addon.id}" name="addon_${addon.id}" value="${addon.id}" ${selectedAddons.includes(addon.id) ? 'checked' : ''} onchange="calculateQuoteTotal()" style="margin-right: 10px;">
-            <span style="flex: 1;">${addon.name} (${addon.unit})</span>
-            <span style="font-weight: 600; color: #e43b04;">+$${addon.price}</span>
-        </label>
-    `).join('');
+    const addonsHTML = (template.addons || []).map((addon, index) => {
+        // Check if this addon was selected by matching the name
+        const isSelected = selectedAddons.some(selected => selected.name === addon.name);
+        return `
+            <label style="display: flex; align-items: center; padding: 10px; background: #f8f9fa; margin-bottom: 10px; border-radius: 8px; cursor: pointer;">
+                <input type="checkbox" id="addon_${addon.id}" name="addon_${addon.id}" value="${addon.id}" ${isSelected ? 'checked' : ''} onchange="calculateQuoteTotal()" style="margin-right: 10px;">
+                <span style="flex: 1;">${addon.name} (${addon.unit})</span>
+                <span style="font-weight: 600; color: #e43b04;">+$${addon.price}</span>
+            </label>
+        `;
+    }).join('');
     
     modalContent.innerHTML = `
         <h2 style="margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #e0e0e0;">
