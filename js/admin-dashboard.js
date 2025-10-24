@@ -3997,17 +3997,9 @@ function editQuote(quoteId) {
     
     // Check which addons were selected - addons is an array of {name, price} objects
     const selectedAddons = quote.details?.addons || [];
-    console.log('Edit Quote - Selected addons:', selectedAddons);
-    console.log('Edit Quote - Template addons:', template.addons);
-    
     const addonsHTML = (template.addons || []).map((addon, index) => {
         // Check if this addon was selected by matching the name
-        const isSelected = selectedAddons.some(selected => {
-            const match = selected.name === addon.name;
-            console.log(`Comparing "${selected.name}" === "${addon.name}": ${match}`);
-            return match;
-        });
-        console.log(`Addon "${addon.name}" isSelected:`, isSelected);
+        const isSelected = selectedAddons.some(selected => selected.name === addon.name);
         return `
             <label style="display: flex; align-items: center; padding: 10px; background: #f8f9fa; margin-bottom: 10px; border-radius: 8px; cursor: pointer;">
                 <input type="checkbox" id="addon_${addon.id}" name="addon_${addon.id}" value="${addon.id}" ${isSelected ? 'checked' : ''} onchange="calculateQuoteTotal()" style="margin-right: 10px;">
@@ -4429,7 +4421,7 @@ async function createQuote(event, contactId) {
         if (addon) {
             lineItems.push({
                 type: 'addon',
-                description: addon.label,
+                description: addon.name,
                 quantity: 1,
                 rate: addon.price,
                 hours: 1,
