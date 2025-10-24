@@ -69,6 +69,18 @@
         </div>
     </div>
     
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Configuration -->
+    <script>
+        // Initialize Supabase client
+        const SUPABASE_URL = 'https://orqsmybwoiswwngzrgvq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ycXNteWJ3b2lzd3duZ3pyZ3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyNDUzNTcsImV4cCI6MjA3NjgyMTM1N30.5ESQMLMIOImqFrLngT-rELO5oYRUb8nREZHnm73RXRI';
+        
+        window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+    
     <script src="js/admin-login.js"></script>
 </body>
 </html>

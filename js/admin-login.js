@@ -23,21 +23,22 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
         
         try {
-            // TODO: Replace with Supabase authentication
-            // For now, we'll use a simple check (TEMPORARY - INSECURE)
-            if (email === 'admin@opservesafetygroup.com') {
-                // TEMPORARY: Accept any password for demo
-                // Store session (to be replaced with Supabase session)
-                sessionStorage.setItem('adminAuth', JSON.stringify({
-                    email: email,
-                    timestamp: Date.now()
-                }));
-                
-                // Redirect to dashboard
-                window.location.href = 'admin-dashboard.html';
-            } else {
-                throw new Error('Invalid credentials');
-            }
+            // Authenticate with Supabase
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) throw error;
+            
+            // Store session info (Supabase handles the session automatically)
+            sessionStorage.setItem('adminAuth', JSON.stringify({
+                email: email,
+                timestamp: Date.now()
+            }));
+            
+            // Redirect to dashboard
+            window.location.href = 'admin-dashboard.html';
         } catch (error) {
             console.error('Login error:', error);
             errorMessage.textContent = error.message || 'Invalid email or password';
@@ -50,23 +51,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Check if user is already authenticated
-    function checkAuth() {
-        const auth = sessionStorage.getItem('adminAuth');
-        if (auth) {
-            try {
-                const authData = JSON.parse(auth);
-                // Check if session is less than 24 hours old
-                const hoursSinceLogin = (Date.now() - authData.timestamp) / (1000 * 60 * 60);
-                if (hoursSinceLogin < 24) {
-                    // Already logged in, redirect to dashboard
-                    window.location.href = 'admin-dashboard.html';
-                } else {
-                    // Session expired
-                    sessionStorage.removeItem('adminAuth');
-                }
-            } catch (error) {
-                sessionStorage.removeItem('adminAuth');
+    async function checkAuth() {
+        try {
+            const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+            
+            if (session && !error) {
+                // Already logged in, redirect to dashboard
+                window.location.href = 'admin-dashboard.html';
             }
+        } catch (error) {
+            console.error('Auth check error:', error);
+            // Not logged in or error, stay on login page
         }
     }
 });

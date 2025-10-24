@@ -16,28 +16,23 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Check if user is authenticated
-function checkAuth() {
-    const auth = sessionStorage.getItem('adminAuth');
-    if (!auth) {
-        window.location.href = 'admin-login.html';
-        return;
-    }
-    
+async function checkAuth() {
     try {
-        const authData = JSON.parse(auth);
-        // Check if session is less than 24 hours old
-        const hoursSinceLogin = (Date.now() - authData.timestamp) / (1000 * 60 * 60);
-        if (hoursSinceLogin >= 24) {
-            // Session expired
-            sessionStorage.removeItem('adminAuth');
+        const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+        
+        if (!session || error) {
+            // Not authenticated, redirect to login
             window.location.href = 'admin-login.html';
             return;
         }
         
         // Set admin email in header
-        document.getElementById('adminEmail').textContent = authData.email;
+        const emailElement = document.getElementById('adminEmail');
+        if (emailElement) {
+            emailElement.textContent = session.user.email;
+        }
     } catch (error) {
-        sessionStorage.removeItem('adminAuth');
+        console.error('Auth check error:', error);
         window.location.href = 'admin-login.html';
     }
 }
@@ -104,11 +99,16 @@ function setupEventListeners() {
 }
 
 // Logout
-function logout() {
+async function logout() {
     if (confirm('Are you sure you want to logout?')) {
-        sessionStorage.removeItem('adminAuth');
-        // TODO: Supabase logout
-        window.location.href = 'admin-login.html';
+        try {
+            await window.supabaseClient.auth.signOut();
+            sessionStorage.removeItem('adminAuth');
+            window.location.href = 'admin-login.html';
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Error logging out. Please try again.');
+        }
     }
 }
 
