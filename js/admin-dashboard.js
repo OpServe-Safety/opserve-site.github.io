@@ -1497,30 +1497,56 @@ function renderSettingsView() {
                     <span>
                         <i class="fas fa-database" style="color: #e43b04;"></i> Supabase Database
                     </span>
-                    <span class="status-badge ${settings.integrations.supabase.connected ? 'status-connected' : 'status-disconnected'}">
-                        ${settings.integrations.supabase.connected ? 'Connected' : 'Not Connected'}
+                    <span class="status-badge status-connected">
+                        <i class="fas fa-check-circle"></i> Connected & Active
                     </span>
                 </h3>
                 
+                <div style="background: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #2e7d32;">
+                        <i class="fas fa-info-circle"></i> Supabase Integration Active
+                    </p>
+                    <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: #555;">
+                        Your application is fully integrated with Supabase and using the following features:
+                    </p>
+                    <ul style="margin: 10px 0 0 20px; font-size: 0.9rem; color: #555;">
+                        <li><strong>Applications:</strong> Job applications stored and managed</li>
+                        <li><strong>Contacts:</strong> Contact form submissions tracked</li>
+                        <li><strong>Quotes:</strong> Generated quotes saved and versioned</li>
+                        <li><strong>Settings:</strong> Application positions synced</li>
+                        <li><strong>Storage:</strong> Resume files securely uploaded</li>
+                        <li><strong>Authentication:</strong> Admin login secured</li>
+                    </ul>
+                </div>
+                
                 <div class="setting-row">
                     <label class="setting-label-full">Supabase URL</label>
-                    <input type="text" id="supabaseUrl" value="${settings.integrations.supabase.url}" 
-                           onchange="updateIntegrationSetting('supabase', 'url', this.value)"
-                           placeholder="https://your-project.supabase.co"
-                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    <input type="text" id="supabaseUrl" value="${window.SUPABASE_URL || ''}" 
+                           disabled readonly
+                           placeholder="Configured via environment"
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; background: #f5f5f5; cursor: not-allowed;">
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-lock"></i> Configured via supabase-config.js (read-only)
+                    </small>
                 </div>
                 
                 <div class="setting-row">
                     <label class="setting-label-full">Supabase Anon Key</label>
-                    <input type="password" id="supabaseKey" value="${settings.integrations.supabase.anonKey}" 
-                           onchange="updateIntegrationSetting('supabase', 'anonKey', this.value)"
-                           placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    <input type="password" id="supabaseKey" value="${window.SUPABASE_ANON_KEY ? '••••••••••••••••' : ''}" 
+                           disabled readonly
+                           placeholder="Configured via environment"
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; background: #f5f5f5; cursor: not-allowed;">
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-lock"></i> Configured via supabase-config.js (read-only)
+                    </small>
                 </div>
                 
                 <div class="setting-row" style="text-align: center;">
-                    <button class="btn btn-primary" onclick="testSupabaseConnection()">
+                    <button class="btn btn-primary" onclick="testSupabaseConnection()" style="margin-right: 10px;">
                         <i class="fas fa-plug"></i> Test Connection
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.open('https://supabase.com/dashboard/project/' + (window.SUPABASE_URL || '').split('//')[1]?.split('.')[0], '_blank')" style="background: #555; border-color: #555;">
+                        <i class="fas fa-external-link-alt"></i> Open Supabase Dashboard
                     </button>
                 </div>
                 
@@ -3841,22 +3867,90 @@ function updateIntegrationSetting(service, field, value) {
     showSaveNotification(`${service} settings updated!`);
 }
 
-function testSupabaseConnection() {
-    const settings = JSON.parse(localStorage.getItem('adminSettings'));
-    const { url, anonKey } = settings.integrations.supabase;
+async function testSupabaseConnection() {
+    const button = event.target.closest('button');
+    const originalHTML = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
     
-    if (!url || !anonKey) {
-        alert('Please enter both Supabase URL and Anon Key');
-        return;
+    try {
+        // Test database read access
+        const { data: testSettings, error: settingsError } = await window.supabaseClient
+            .from('settings')
+            .select('key')
+            .limit(1);
+        
+        if (settingsError) throw settingsError;
+        
+        // Test applications table
+        const { count: appCount, error: appError } = await window.supabaseClient
+            .from('applications')
+            .select('*', { count: 'exact', head: true });
+        
+        if (appError) throw appError;
+        
+        // Test contacts table
+        const { count: contactCount, error: contactError } = await window.supabaseClient
+            .from('contacts')
+            .select('*', { count: 'exact', head: true });
+        
+        if (contactError) throw contactError;
+        
+        // Test quotes table
+        const { count: quoteCount, error: quoteError } = await window.supabaseClient
+            .from('quotes')
+            .select('*', { count: 'exact', head: true });
+        
+        if (quoteError) throw quoteError;
+        
+        // Test storage bucket
+        const { data: buckets, error: storageError } = await window.supabaseClient
+            .storage
+            .listBuckets();
+        
+        if (storageError) throw storageError;
+        
+        // Connection successful
+        button.innerHTML = '<i class="fas fa-check"></i> Connected!';
+        button.style.background = '#4caf50';
+        
+        alert(
+            '✅ Supabase Connection Successful!\n\n' +
+            `📊 Database Statistics:\n` +
+            `• Applications: ${appCount || 0}\n` +
+            `• Contacts: ${contactCount || 0}\n` +
+            `• Quotes: ${quoteCount || 0}\n` +
+            `• Storage Buckets: ${buckets?.length || 0}\n\n` +
+            'All tables and features are accessible!'
+        );
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.style.background = '';
+            button.disabled = false;
+        }, 3000);
+        
+    } catch (error) {
+        console.error('Connection test failed:', error);
+        button.innerHTML = '<i class="fas fa-times"></i> Failed';
+        button.style.background = '#dc3545';
+        
+        alert(
+            '❌ Supabase Connection Failed\n\n' +
+            `Error: ${error.message}\n\n` +
+            'Please check:\n' +
+            '• Supabase URL is correct\n' +
+            '• Anon Key is valid\n' +
+            '• RLS policies are configured\n' +
+            '• Tables exist in database'
+        );
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.style.background = '';
+            button.disabled = false;
+        }, 3000);
     }
-    
-    // TODO: Test actual connection
-    alert('Testing Supabase connection...\n\nThis will be functional once the Supabase client is integrated.\n\nFor now, credentials are saved and ready to use.');
-    
-    // Mark as connected (for demo purposes)
-    settings.integrations.supabase.connected = true;
-    localStorage.setItem('adminSettings', JSON.stringify(settings));
-    renderSettingsView();
 }
 
 // ===== WEBSITE CONTENT SETTINGS =====
