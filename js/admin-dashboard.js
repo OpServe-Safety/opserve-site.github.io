@@ -1756,20 +1756,33 @@ async function renderContactsView() {
 }
 
 // Render quotes view
-function renderQuotesView() {
+async function renderQuotesView() {
     const mainContent = document.querySelector('.dashboard-main');
     
-    // Load sample quotes
-    allQuotes = getSampleQuotes();
-    filteredQuotes = allQuotes;
+    // Load quotes from Supabase
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('quotes')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        allQuotes = data || [];
+        filteredQuotes = allQuotes;
+    } catch (error) {
+        console.error('Error loading quotes:', error);
+        allQuotes = [];
+        filteredQuotes = [];
+    }
     
     // Calculate stats
     const stats = {
         total: allQuotes.length,
-        pending: allQuotes.filter(q => q.status === 'pending').length,
+        pending: allQuotes.filter(q => q.status === 'draft').length,
         sent: allQuotes.filter(q => q.status === 'sent').length,
         accepted: allQuotes.filter(q => q.status === 'accepted').length,
-        revenue: allQuotes.filter(q => q.status === 'accepted').reduce((sum, q) => sum + q.pricing.total, 0)
+        revenue: allQuotes.filter(q => q.status === 'accepted').reduce((sum, q) => sum + parseFloat(q.total || 0), 0)
     };
     
     mainContent.innerHTML = `
@@ -2808,27 +2821,40 @@ function renderQuotesTable(quotes) {
     emptyState.style.display = 'none';
     
     tbody.innerHTML = quotes.map(quote => {
-        const eventDate = new Date(quote.details.eventDate);
+        const eventDate = quote.event_date ? new Date(quote.event_date) : null;
+        const serviceNames = {
+            'event-security': 'Event Security',
+            'crowd-management': 'Crowd Management',
+            'executive-protection': 'Executive Protection',
+            'risk-assessment': 'Risk Assessment',
+            'other': 'Other'
+        };
+        const serviceName = serviceNames[quote.service] || quote.service;
         
         return `
             <tr>
-                <td><strong>${quote.quoteNumber}</strong></td>
+                <td><strong>${quote.quote_number}</strong></td>
                 <td>
-                    <strong>${quote.clientName}</strong><br>
-                    <small style="color: #666;">${quote.clientEmail}</small>
+                    <strong>${quote.client_name}</strong><br>
+                    <small style="color: #666;">${quote.client_email}</small>
                 </td>
                 <td>
                     <span class="badge badge-info">
-                        <i class="fas ${getServiceIcon(quote.service)}" style="color: #e43b04;"></i> ${quote.serviceName}
+                        <i class="fas ${getServiceIcon(quote.service)}" style="color: #e43b04;"></i> ${serviceName}
                     </span>
                 </td>
-                <td><strong>$${quote.pricing.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></td>
-                <td>${eventDate.toLocaleDateString()}</td>
+                <td><strong>$${parseFloat(quote.total || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></td>
+                <td>${eventDate ? eventDate.toLocaleDateString() : 'N/A'}</td>
                 <td>${getQuoteStatusBadge(quote.status)}</td>
                 <td>
-                    <button class="btn btn-icon" onclick="viewQuoteDetail('${quote.id}')" title="View quote">
-                        <i class="fas fa-eye"></i>
-                    </button>
+                    <div class="action-btns">
+                        <button class="btn-icon" onclick="viewQuoteDetail('${quote.id}')" title="View quote">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon" onclick="deleteQuote('${quote.id}')" title="Delete Quote" style="color: #dc3545;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -2838,12 +2864,47 @@ function renderQuotesTable(quotes) {
 // Get quote status badge
 function getQuoteStatusBadge(status) {
     const badges = {
-        'pending': '<span class="badge badge-info">Pending</span>',
+        'draft': '<span class="badge badge-info">Draft</span>',
         'sent': '<span class="badge badge-review">Sent</span>',
         'accepted': '<span class="badge badge-approved">Accepted</span>',
-        'declined': '<span class="badge badge-denied">Declined</span>'
+        'rejected': '<span class="badge badge-denied">Rejected</span>',
+        'expired': '<span class="badge" style="background: #999;">Expired</span>'
     };
     return badges[status] || status;
+}
+
+// Delete quote
+async function deleteQuote(id) {
+    const quote = allQuotes.find(q => q.id === id);
+    if (!quote) return;
+    
+    const confirmMsg = `Are you sure you want to delete quote ${quote.quote_number}?\n\nThis action cannot be undone.`;
+    
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+    
+    try {
+        // Delete from Supabase
+        const { error } = await window.supabaseClient
+            .from('quotes')
+            .delete()
+            .eq('id', id);
+        
+        if (error) throw error;
+        
+        // Remove from local arrays
+        allQuotes = allQuotes.filter(q => q.id !== id);
+        filteredQuotes = filteredQuotes.filter(q => q.id !== id);
+        
+        // Re-render
+        renderQuotesTable(filteredQuotes);
+        
+        showSuccess('Quote deleted successfully');
+    } catch (error) {
+        console.error('Error deleting quote:', error);
+        showError('Failed to delete quote: ' + error.message);
+    }
 }
 
 // Setup event listeners for quotes
