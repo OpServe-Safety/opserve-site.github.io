@@ -1811,7 +1811,7 @@ async function renderSettingsView() {
                 <div class="setting-row">
                     <label class="setting-toggle">
                         <span class="setting-label">Enable Gusto Integration</span>
-                        <input type="checkbox" id="gustoEnabled" ${settings.integrations.gusto.enabled ? 'checked' : ''} 
+                        <input type="checkbox" id="gustoEnabled" ${settings.integrations.gusto?.enabled ? 'checked' : ''} 
                                onchange="updateIntegrationSetting('gusto', 'enabled', this.checked)">
                         <span class="toggle-slider"></span>
                     </label>
@@ -1824,8 +1824,8 @@ async function renderSettingsView() {
                     <label class="setting-label-full">Environment</label>
                     <select id="gustoEnvironment" onchange="updateIntegrationSetting('gusto', 'environment', this.value)"
                             style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
-                        <option value="sandbox" ${settings.integrations.gusto.environment === 'sandbox' ? 'selected' : ''}>Sandbox (Testing)</option>
-                        <option value="production" ${settings.integrations.gusto.environment === 'production' ? 'selected' : ''}>Production</option>
+                        <option value="sandbox" ${settings.integrations.gusto?.environment === 'sandbox' ? 'selected' : ''}>Sandbox (Testing)</option>
+                        <option value="production" ${settings.integrations.gusto?.environment === 'production' ? 'selected' : ''}>Production</option>
                     </select>
                     <small style="display: block; color: #666; margin-top: 5px;">
                         <i class="fas fa-exclamation-triangle"></i> Use Sandbox for testing, Production for live data
@@ -1834,7 +1834,7 @@ async function renderSettingsView() {
                 
                 <div class="setting-row">
                     <label class="setting-label-full">API Key</label>
-                    <input type="password" id="gustoApiKey" value="${settings.integrations.gusto.apiKey}" 
+                    <input type="password" id="gustoApiKey" value="${settings.integrations.gusto?.apiKey || ''}" 
                            onchange="updateIntegrationSetting('gusto', 'apiKey', this.value)"
                            placeholder="Enter your Gusto API token"
                            style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
@@ -1845,7 +1845,7 @@ async function renderSettingsView() {
                 
                 <div class="setting-row">
                     <label class="setting-label-full">Company ID</label>
-                    <input type="text" id="gustoCompanyId" value="${settings.integrations.gusto.companyId}" 
+                    <input type="text" id="gustoCompanyId" value="${settings.integrations.gusto?.companyId || ''}" 
                            onchange="updateIntegrationSetting('gusto', 'companyId', this.value)"
                            placeholder="Enter your Gusto Company ID"
                            style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
