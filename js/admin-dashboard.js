@@ -1378,7 +1378,7 @@ async function renderSettingsView() {
                 <div class="setting-row">
                     <label class="setting-toggle">
                         <span class="setting-label">Notify Admin on New Applications</span>
-                        <input type="checkbox" ${settings.emailNotifications.notifyAdminOnApplication ? 'checked' : ''} 
+                        <input type="checkbox" id="notifyAdminOnApplication" name="notifyAdminOnApplication" ${settings.emailNotifications.notifyAdminOnApplication ? 'checked' : ''} 
                                onchange="updateEmailSetting('notifyAdminOnApplication', this.checked)">
                         <span class="toggle-slider"></span>
                     </label>
@@ -1387,7 +1387,7 @@ async function renderSettingsView() {
                 <div class="setting-row">
                     <label class="setting-toggle">
                         <span class="setting-label">Notify Admin on Contact Form Submissions</span>
-                        <input type="checkbox" ${settings.emailNotifications.notifyAdminOnContact ? 'checked' : ''} 
+                        <input type="checkbox" id="notifyAdminOnContact" name="notifyAdminOnContact" ${settings.emailNotifications.notifyAdminOnContact ? 'checked' : ''} 
                                onchange="updateEmailSetting('notifyAdminOnContact', this.checked)">
                         <span class="toggle-slider"></span>
                     </label>
@@ -1401,15 +1401,15 @@ async function renderSettingsView() {
                 <div class="setting-row">
                     <label class="setting-toggle">
                         <span class="setting-label">Send Confirmation to Applicants</span>
-                        <input type="checkbox" ${settings.emailNotifications.applicationEmail.enabled ? 'checked' : ''} 
+                        <input type="checkbox" id="appEmailEnabled" name="appEmailEnabled" ${settings.emailNotifications.applicationEmail.enabled ? 'checked' : ''} 
                                onchange="updateEmailTemplateSetting('applicationEmail', 'enabled', this.checked)">
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
                 
                 <div class="setting-row">
-                    <label class="setting-label-full">Subject Line</label>
-                    <input type="text" value="${settings.emailNotifications.applicationEmail.subject}" 
+                    <label class="setting-label-full" for="appEmailSubject">Subject Line</label>
+                    <input type="text" id="appEmailSubject" name="appEmailSubject" value="${settings.emailNotifications.applicationEmail.subject}" 
                            onchange="updateEmailTemplateSetting('applicationEmail', 'subject', this.value)"
                            placeholder="Application Received - OpServe Safety Group"
                            style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
@@ -1864,6 +1864,34 @@ async function renderSettingsView() {
     
     // Initialize collapsible sections
     initializeCollapsibleSections();
+    
+    // Fix accessibility issues
+    fixFormAccessibility();
+}
+
+// Fix form accessibility - add missing id and name attributes
+function fixFormAccessibility() {
+    const settingsContent = document.querySelector('.dashboard-main');
+    if (!settingsContent) return;
+    
+    // Fix all inputs without id/name
+    const inputs = settingsContent.querySelectorAll('input:not([id]), textarea:not([id]), select:not([id])');
+    inputs.forEach((input, index) => {
+        const uniqueId = `setting-input-${index}`;
+        input.setAttribute('id', uniqueId);
+        input.setAttribute('name', uniqueId);
+    });
+    
+    // Fix labels - associate with inputs
+    const labels = settingsContent.querySelectorAll('label.setting-label-full');
+    labels.forEach(label => {
+        const input = label.nextElementSibling;
+        if (input && (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA' || input.tagName === 'SELECT')) {
+            if (input.id) {
+                label.setAttribute('for', input.id);
+            }
+        }
+    });
 }
 
 // Initialize collapsible settings sections (accordion style - only one open at a time)
