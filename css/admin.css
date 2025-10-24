@@ -1005,6 +1005,16 @@
     .dashboard-user {
         font-size: 0.85rem;
     }
+    
+    /* Mobile Filter Button - Show on tablet and below */
+    .mobile-filter-btn {
+        display: flex;
+    }
+    
+    /* Hide desktop filter buttons on mobile */
+    .filter-group {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
