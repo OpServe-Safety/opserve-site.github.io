@@ -201,6 +201,9 @@ function renderApplications(applications) {
                     <button class="btn-icon" onclick="event.stopPropagation(); changeStatus('${app.id}')" title="Change Status">
                         <i class="fas fa-edit"></i>
                     </button>
+                    <button class="btn-icon" onclick="event.stopPropagation(); deleteApplication('${app.id}')" title="Delete Application" style="color: #dc3545;">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </td>
         </tr>
@@ -312,6 +315,40 @@ function updateApplicationStatus(id, newStatus) {
         
         // Show success message
         showSuccess(`Application status updated to "${formatStatus(newStatus)}"`);
+    }
+}
+
+// Delete application
+async function deleteApplication(id) {
+    const application = window.allApplications.find(app => app.id === id);
+    if (!application) return;
+    
+    const confirmMsg = `Are you sure you want to delete the application from ${application.firstName} ${application.lastName}?\n\nThis action cannot be undone.`;
+    
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+    
+    try {
+        // Delete from Supabase
+        const { error } = await window.supabaseClient
+            .from('applications')
+            .delete()
+            .eq('id', id);
+        
+        if (error) throw error;
+        
+        // Remove from local array
+        window.allApplications = window.allApplications.filter(app => app.id !== id);
+        
+        // Re-render
+        updateStats(window.allApplications);
+        renderApplications(window.allApplications);
+        
+        showSuccess('Application deleted successfully');
+    } catch (error) {
+        console.error('Error deleting application:', error);
+        showError('Failed to delete application: ' + error.message);
     }
 }
 
