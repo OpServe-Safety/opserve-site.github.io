@@ -1409,12 +1409,13 @@ input[type="date"]:focus {
     /* Form adjustments */
     .form-row {
         flex-direction: column;
-        gap: 0;
+        gap: 15px;
     }
     
     .form-row .form-group {
         width: 100%;
         flex: 1 !important;
+        margin-bottom: 0;
     }
     
     .form-section {
