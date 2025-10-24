@@ -659,11 +659,9 @@ async function initializeSettings() {
                 recaptcha: { ...defaultSettings.integrations.recaptcha, ...(settings.integrations?.recaptcha || {}) }
             },
             quoteSettings: settings.quoteSettings ? {
-                ...defaultSettings.quoteSettings,
-                ...settings.quoteSettings,
-                services: settings.quoteSettings?.services || defaultSettings.quoteSettings.services,
-                paymentTerms: settings.quoteSettings?.paymentTerms || defaultSettings.quoteSettings.paymentTerms
-            } : defaultSettings.quoteSettings,
+                ...defaultSettings.integrations.quoteSettings,
+                ...settings.quoteSettings
+            } : defaultSettings.integrations.quoteSettings,
             websiteContent: settings.websiteContent ? {
                 hero: { ...defaultSettings.websiteContent.hero, ...(settings.websiteContent.hero || {}) },
                 about: { ...defaultSettings.websiteContent.about, ...(settings.websiteContent.about || {}) },
