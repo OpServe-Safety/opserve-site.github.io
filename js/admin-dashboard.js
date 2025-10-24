@@ -198,9 +198,6 @@ function renderApplications(applications) {
                     <button class="btn-icon" onclick="event.stopPropagation(); viewApplication('${app.id}')" title="View Details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn-icon" onclick="event.stopPropagation(); changeStatus('${app.id}')" title="Change Status">
-                        <i class="fas fa-edit"></i>
-                    </button>
                     <button class="btn-icon" onclick="event.stopPropagation(); deleteApplication('${app.id}')" title="Delete Application" style="color: #dc3545;">
                         <i class="fas fa-trash"></i>
                     </button>
