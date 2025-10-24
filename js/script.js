@@ -406,12 +406,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ===== LOAD WEBSITE CONTENT FROM SETTINGS =====
-    function loadWebsiteContent() {
-        const websiteContent = localStorage.getItem('websiteContent');
-        if (!websiteContent) return;
-        
+    async function loadWebsiteContent() {
         try {
-            const content = JSON.parse(websiteContent);
+            // Load from Supabase
+            const { data, error } = await window.supabaseClient
+                .from('settings')
+                .select('value')
+                .eq('key', 'websiteContent')
+                .single();
+            
+            if (error) {
+                console.log('No custom content found, using defaults');
+                return;
+            }
+            
+            const content = data.value;
             
             // Update Hero Section
             const heroHeadline = document.querySelector('.hero-content h1');

@@ -3459,15 +3459,30 @@ function testSupabaseConnection() {
 
 // ===== WEBSITE CONTENT SETTINGS =====
 
-function updateWebsiteContent(section, field, value) {
-    const settings = JSON.parse(localStorage.getItem('adminSettings'));
-    settings.websiteContent[section][field] = value;
-    localStorage.setItem('adminSettings', JSON.stringify(settings));
-    
-    // Sync to website
-    localStorage.setItem('websiteContent', JSON.stringify(settings.websiteContent));
-    
-    showSaveNotification(`${section} content updated!`);
+async function updateWebsiteContent(section, field, value) {
+    try {
+        // Update local storage first for immediate feedback
+        const settings = JSON.parse(localStorage.getItem('adminSettings'));
+        settings.websiteContent[section][field] = value;
+        localStorage.setItem('adminSettings', JSON.stringify(settings));
+        
+        // Save to Supabase
+        const { error } = await window.supabaseClient
+            .from('settings')
+            .upsert({
+                key: 'websiteContent',
+                value: settings.websiteContent
+            }, {
+                onConflict: 'key'
+            });
+        
+        if (error) throw error;
+        
+        showSaveNotification(`${section} content updated and published!`);
+    } catch (error) {
+        console.error('Error saving website content:', error);
+        showError('Failed to save website content: ' + error.message);
+    }
 }
 
 function updateServiceCard(serviceKey, field, value) {
