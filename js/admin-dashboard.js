@@ -1850,7 +1850,10 @@ async function renderQuotesView() {
                 addons: quote.line_items ?
                     quote.line_items
                         .filter(item => item.type === 'addon')
-                        .map(item => item.description) : []
+                        .map(item => ({
+                            name: item.description,
+                            price: item.amount
+                        })) : []
             },
             pricing: {
                 personnelCost: quote.line_items ?
@@ -3182,16 +3185,12 @@ function viewQuoteDetail(id) {
         <div style="margin-bottom: 25px;">
             <h3 style="margin-bottom: 15px;">Additional Services</h3>
             <table style="width: 100%; border-collapse: collapse;">
-                ${quote.details.addons.map(addonId => {
-                    const template = servicePricingTemplates[quote.service];
-                    const addon = template.addons.find(a => a.id === addonId);
-                    return addon ? `
+                ${quote.details.addons.map(addon => `
                     <tr style="border-bottom: 1px solid #e0e0e0;">
                         <td style="padding: 10px 0;">${addon.name}</td>
                         <td style="text-align: right; padding: 10px 0;">$${addon.price.toFixed(2)}</td>
                     </tr>
-                    ` : '';
-                }).join('')}
+                `).join('')}
             </table>
         </div>
         ` : ''}
@@ -3619,7 +3618,10 @@ async function createQuote(event, contactId) {
                 duration: data.event_duration,
                 venueSize: data.expected_attendance || 0,
                 personnel: personnel,
-                addons: addons
+                addons: addons.map(addonId => {
+                    const addon = template.addons.find(a => a.id === addonId);
+                    return addon ? { name: addon.label, price: addon.price } : null;
+                }).filter(Boolean)
             },
             pricing: {
                 personnelCost: personnelCost,
