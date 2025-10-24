@@ -3,7 +3,15 @@
 // Format phone number to (XXX) XXX-XXXX
 function formatPhoneNumber(value) {
     if (!value) return value;
-    const phoneNumber = value.replace(/[^\d]/g, '');
+    
+    // Remove all non-digits
+    let phoneNumber = value.replace(/[^\d]/g, '');
+    
+    // If starts with 1 and is 11 digits, remove the country code
+    if (phoneNumber.length === 11 && phoneNumber[0] === '1') {
+        phoneNumber = phoneNumber.slice(1);
+    }
+    
     const phoneNumberLength = phoneNumber.length;
     
     if (phoneNumberLength < 4) return phoneNumber;
