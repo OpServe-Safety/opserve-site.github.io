@@ -4006,9 +4006,9 @@ function editQuote(quoteId) {
     
     // Check which addons were selected
     const selectedAddons = quote.details?.addons || [];
-    const addonsHTML = (template.addons || []).map(addon => `
+    const addonsHTML = (template.addons || []).map((addon, index) => `
         <label style="display: flex; align-items: center; padding: 10px; background: #f8f9fa; margin-bottom: 10px; border-radius: 8px; cursor: pointer;">
-            <input type="checkbox" value="${addon.id}" ${selectedAddons.includes(addon.id) ? 'checked' : ''} onchange="calculateQuoteTotal()" style="margin-right: 10px;">
+            <input type="checkbox" id="addon_${addon.id}" name="addon_${addon.id}" value="${addon.id}" ${selectedAddons.includes(addon.id) ? 'checked' : ''} onchange="calculateQuoteTotal()" style="margin-right: 10px;">
             <span style="flex: 1;">${addon.name} (${addon.unit})</span>
             <span style="font-weight: 600; color: #e43b04;">+$${addon.price}</span>
         </label>
@@ -4113,6 +4113,7 @@ function editQuote(quoteId) {
     `;
     
     modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('active'), 10);
     
     // Calculate total on load
     setTimeout(() => calculateQuoteTotal(), 100);
@@ -4218,9 +4219,9 @@ function openQuoteBuilder(contactId) {
             
             <div style="margin-bottom: 25px;">
                 <h3 style="margin-bottom: 15px;">Add-ons</h3>
-                ${template.addons.map(addon => `
+                ${template.addons.map((addon, index) => `
                     <label style="display: flex; align-items: center; padding: 10px; background: #f8f9fa; margin-bottom: 10px; border-radius: 8px; cursor: pointer;">
-                        <input type="checkbox" value="${addon.id}" onchange="calculateQuoteTotal()" style="margin-right: 10px;">
+                        <input type="checkbox" id="addon_${addon.id}" name="addon_${addon.id}" value="${addon.id}" onchange="calculateQuoteTotal()" style="margin-right: 10px;">
                         <span style="flex: 1;">${addon.name} (${addon.unit})</span>
                         <span style="font-weight: 600; color: #e43b04;">+$${addon.price}</span>
                     </label>
