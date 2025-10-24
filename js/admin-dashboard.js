@@ -3066,9 +3066,9 @@ function openQuoteBuilder(contactId) {
     const modalContent = document.getElementById('quoteBuilderContent');
     
     // Get settings from localStorage
-    const settings = JSON.parse(localStorage.getItem('adminSettings'));
-    const template = servicePricingTemplates[contact.service];
-    const serviceSettings = settings.quoteSettings.services[contact.service];
+    const settings = JSON.parse(localStorage.getItem('adminSettings')) || {};
+    const template = servicePricingTemplates[contact.service] || {};
+    const serviceSettings = settings.quoteSettings?.services?.[contact.service] || {};
     const today = new Date();
     const nextMonth = new Date(today);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
@@ -3080,13 +3080,15 @@ function openQuoteBuilder(contactId) {
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
                 <div>
                     <h4 style="color: #666; margin-bottom: 15px;">CLIENT INFORMATION</h4>
-                    <p style="margin: 5px 0;"><strong>${contact.company || contact.name}</strong></p>
+                    <p style="margin: 5px 0;"><strong>${contact.name}</strong></p>
                     <p style="margin: 5px 0; color: #666;">${contact.email}</p>
                     <p style="margin: 5px 0; color: #666;"><i class="fas fa-map-marker-alt" style="color: #e43b04;"></i> ${contact.state || 'State not provided'}</p>
                 </div>
                 <div>
                     <h4 style="color: #666; margin-bottom: 15px;">SERVICE</h4>
-                    <p style="margin: 5px 0;"><i class="fas ${getServiceIcon(contact.service)}" style="color: #e43b04;"></i> ${contact.serviceName}</p>
+                    <p style="margin: 5px 0;"><i class="fas ${getServiceIcon(contact.service)}" style="color: #e43b04;"></i> ${
+                        {'event-security': 'Event Security', 'crowd-management': 'Crowd Management', 'executive-protection': 'Executive Protection', 'risk-assessment': 'Risk Assessment', 'other': 'Other'}[contact.service] || contact.service
+                    }</p>
                 </div>
             </div>
             
