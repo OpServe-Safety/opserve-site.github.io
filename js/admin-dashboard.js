@@ -1889,7 +1889,7 @@ async function renderQuotesView() {
         pending: allQuotes.filter(q => q.status === 'draft').length,
         sent: allQuotes.filter(q => q.status === 'sent').length,
         accepted: allQuotes.filter(q => q.status === 'accepted').length,
-        revenue: allQuotes.filter(q => q.status === 'accepted').reduce((sum, q) => sum + parseFloat(q.total || 0), 0)
+        revenue: allQuotes.filter(q => q.status === 'accepted').reduce((sum, q) => sum + parseFloat(q.pricing?.total || 0), 0)
     };
     
     mainContent.innerHTML = `
@@ -2965,29 +2965,21 @@ function renderQuotesTable(quotes) {
     emptyState.style.display = 'none';
     
     tbody.innerHTML = quotes.map(quote => {
-        const eventDate = quote.event_date ? new Date(quote.event_date) : null;
-        const serviceNames = {
-            'event-security': 'Event Security',
-            'crowd-management': 'Crowd Management',
-            'executive-protection': 'Executive Protection',
-            'risk-assessment': 'Risk Assessment',
-            'other': 'Other'
-        };
-        const serviceName = serviceNames[quote.service] || quote.service;
+        const eventDate = quote.details?.eventDate ? new Date(quote.details.eventDate) : null;
         
         return `
             <tr>
-                <td><strong>${quote.quote_number}</strong></td>
+                <td><strong>${quote.quoteNumber}</strong></td>
                 <td>
-                    <strong>${quote.client_name}</strong><br>
-                    <small style="color: #666;">${quote.client_email}</small>
+                    <strong>${quote.clientName}</strong><br>
+                    <small style="color: #666;">${quote.clientEmail}</small>
                 </td>
                 <td>
                     <span class="badge badge-info">
-                        <i class="fas ${getServiceIcon(quote.service)}" style="color: #e43b04;"></i> ${serviceName}
+                        <i class="fas ${getServiceIcon(quote.service)}" style="color: #e43b04;"></i> ${quote.serviceName}
                     </span>
                 </td>
-                <td><strong>$${parseFloat(quote.total || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></td>
+                <td><strong>$${parseFloat(quote.pricing?.total || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></td>
                 <td>${eventDate ? eventDate.toLocaleDateString() : 'N/A'}</td>
                 <td>${getQuoteStatusBadge(quote.status)}</td>
                 <td>
