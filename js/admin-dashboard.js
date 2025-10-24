@@ -1662,8 +1662,14 @@ function initializeCollapsibleSections() {
             // Collapse by default
             content.style.display = 'none';
             
+            // Prevent clicks inside content from bubbling to header
+            content.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
             // Toggle on click (accordion behavior)
-            header.addEventListener('click', function() {
+            header.addEventListener('click', function(e) {
+                // Only toggle if clicking the header itself, not elements inside content
                 const isCurrentlyCollapsed = content.style.display === 'none';
                 
                 // Close all sections first
@@ -3844,26 +3850,58 @@ function updateSecuritySetting(field, value) {
     showSaveNotification('Security settings updated!');
 }
 
-function changeAdminPassword() {
+async function changeAdminPassword() {
     const currentPassword = prompt('Enter current password:');
     if (!currentPassword) return;
     
-    // TODO: Validate current password with Supabase
-    
     const newPassword = prompt('Enter new password (min 8 characters):');
     if (!newPassword || newPassword.length < 8) {
-        alert('Password must be at least 8 characters long');
+        alert('❌ Password must be at least 8 characters long');
         return;
     }
     
     const confirmPassword = prompt('Confirm new password:');
     if (newPassword !== confirmPassword) {
-        alert('Passwords do not match');
+        alert('❌ Passwords do not match');
         return;
     }
     
-    // TODO: Update password in Supabase
-    alert('Password change functionality will be enabled when Supabase is connected.');
+    try {
+        // Get current user
+        const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
+        
+        if (userError || !user) {
+            alert('❌ Error: Unable to get current user. Please log in again.');
+            return;
+        }
+        
+        // Verify current password by attempting to sign in
+        const { error: signInError } = await window.supabaseClient.auth.signInWithPassword({
+            email: user.email,
+            password: currentPassword
+        });
+        
+        if (signInError) {
+            alert('❌ Current password is incorrect');
+            return;
+        }
+        
+        // Update password
+        const { error: updateError } = await window.supabaseClient.auth.updateUser({
+            password: newPassword
+        });
+        
+        if (updateError) {
+            throw updateError;
+        }
+        
+        alert('✅ Password changed successfully!\n\nYour new password will be required on your next login.');
+        showSaveNotification('Password updated successfully!');
+        
+    } catch (error) {
+        console.error('Error changing password:', error);
+        alert('❌ Failed to change password: ' + error.message);
+    }
 }
 
 // ===== INTEGRATION SETTINGS =====
