@@ -827,13 +827,52 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Get form data
             const formData = new FormData(this);
+            
+            // Collect all service-specific details
+            const serviceDetails = {};
+            
+            // Get event date if exists
+            if (formData.get('eventDate')) serviceDetails.eventDate = formData.get('eventDate');
+            if (formData.get('expectedAttendance')) serviceDetails.expectedAttendance = formData.get('expectedAttendance');
+            if (formData.get('eventDuration')) serviceDetails.eventDuration = formData.get('eventDuration');
+            if (formData.get('venueLocation')) serviceDetails.venueLocation = formData.get('venueLocation');
+            if (formData.get('venueSize')) serviceDetails.venueSize = formData.get('venueSize');
+            
+            // Executive protection fields
+            if (formData.get('startDate')) serviceDetails.startDate = formData.get('startDate');
+            if (formData.get('endDate')) serviceDetails.endDate = formData.get('endDate');
+            if (formData.get('numProtectees')) serviceDetails.numProtectees = formData.get('numProtectees');
+            if (formData.get('protectionLevel')) serviceDetails.protectionLevel = formData.get('protectionLevel');
+            
+            // Risk assessment fields
+            if (formData.get('assessmentType')) serviceDetails.assessmentType = formData.get('assessmentType');
+            if (formData.get('facilityType')) serviceDetails.facilityType = formData.get('facilityType');
+            if (formData.get('facilitySize')) serviceDetails.facilitySize = formData.get('facilitySize');
+            
+            // Collect add-ons
+            const addons = formData.getAll('addons[]');
+            if (addons.length > 0) serviceDetails.addons = addons;
+            
+            // Build message with service details
+            let fullMessage = formData.get('message') || '';
+            if (Object.keys(serviceDetails).length > 0) {
+                fullMessage += '\n\n--- Service Details ---\n';
+                for (const [key, value] of Object.entries(serviceDetails)) {
+                    if (key === 'addons') {
+                        fullMessage += `${key}: ${value.join(', ')}\n`;
+                    } else {
+                        fullMessage += `${key}: ${value}\n`;
+                    }
+                }
+            }
+            
             const contactData = {
                 name: formData.get('name'),
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 state: formData.get('state'),
                 service: formData.get('service'),
-                message: formData.get('message'),
+                message: fullMessage,
                 status: 'new',
                 created_at: new Date().toISOString()
             };
