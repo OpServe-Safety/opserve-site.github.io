@@ -1797,6 +1797,12 @@ async function renderSettingsView() {
                     </small>
                 </div>
                 
+                <div class="setting-row" style="text-align: center;">
+                    <button class="btn btn-primary" onclick="testEmailConnection()">
+                        <i class="fas fa-paper-plane"></i> Test Email Connection
+                    </button>
+                </div>
+                
                 <!-- Google Analytics -->
                 <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 1.1rem;">
                     <i class="fas fa-chart-line" style="color: #e43b04;"></i> Google Analytics
@@ -4875,6 +4881,123 @@ async function testSupabaseConnection() {
             '• Anon Key is valid\n' +
             '• RLS policies are configured\n' +
             '• Tables exist in database'
+        );
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.style.background = '';
+            button.disabled = false;
+        }, 3000);
+    }
+}
+
+async function testEmailConnection() {
+    const button = event.target.closest('button');
+    const originalHTML = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Test Email...';
+    
+    try {
+        // Get current settings
+        const settings = JSON.parse(localStorage.getItem('adminSettings'));
+        const emailConfig = settings.integrations.emailService;
+        
+        if (!emailConfig.apiKey) {
+            throw new Error('API Key is required');
+        }
+        
+        if (emailConfig.provider !== 'resend') {
+            throw new Error('Currently only Resend is supported for testing');
+        }
+        
+        const fromEmail = emailConfig.fromEmail || 'noreply@opservesafetygroup.com';
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        const testEmailAddress = session?.user?.email || emailConfig.adminEmail || 'admin@opservesafetygroup.com';
+        
+        // Send test email via Resend API
+        const response = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${emailConfig.apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                from: `OpServe Safety Group <${fromEmail}>`,
+                to: [testEmailAddress],
+                subject: 'Test Email - OpServe Admin Dashboard',
+                html: `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+                            .header { background: #e43b04; color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                            .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+                            .success { background: #d4edda; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>OpServe Safety Group</h1>
+                            <p>Email Service Test</p>
+                        </div>
+                        <div class="content">
+                            <div class="success">
+                                <h2 style="margin-top: 0;">✅ Success!</h2>
+                                <p>Your email service is configured correctly and working!</p>
+                            </div>
+                            <p><strong>Test Details:</strong></p>
+                            <ul>
+                                <li>Provider: ${emailConfig.provider}</li>
+                                <li>From: ${fromEmail}</li>
+                                <li>Sent: ${new Date().toLocaleString()}</li>
+                            </ul>
+                            <p style="margin-top: 30px; color: #666; font-size: 14px;">This is an automated test email from your OpServe Safety Group admin dashboard.</p>
+                        </div>
+                    </body>
+                    </html>
+                `
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to send test email');
+        }
+        
+        const result = await response.json();
+        
+        // Success
+        button.innerHTML = '<i class="fas fa-check"></i> Email Sent!';
+        button.style.background = '#4caf50';
+        
+        alert(
+            '✅ Email Service Test Successful!\n\n' +
+            `📧 Test email sent to: ${testEmailAddress}\n` +
+            `📨 Email ID: ${result.id}\n\n` +
+            'Check your inbox to confirm delivery.\n' +
+            '(Check spam folder if not received)'
+        );
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.style.background = '';
+            button.disabled = false;
+        }, 3000);
+        
+    } catch (error) {
+        console.error('Email test failed:', error);
+        button.innerHTML = '<i class="fas fa-times"></i> Failed';
+        button.style.background = '#dc3545';
+        
+        alert(
+            '❌ Email Service Test Failed\n\n' +
+            `Error: ${error.message}\n\n` +
+            'Please check:\n' +
+            '• API Key is correct\n' +
+            '• Email provider is set to "Resend"\n' +
+            '• From email is verified in Resend\n' +
+            '• API key has send permissions'
         );
         
         setTimeout(() => {
