@@ -485,16 +485,19 @@
 .mobile-filter-btn {
     display: none;
     align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
     background: #e43b04;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(228, 59, 4, 0.3);
+    flex-shrink: 0;
 }
 
 .mobile-filter-btn:hover {
@@ -503,13 +506,12 @@
     box-shadow: 0 4px 12px rgba(228, 59, 4, 0.4);
 }
 
+.mobile-filter-btn span {
+    display: none;
+}
+
 .mobile-filter-btn .badge {
-    background: white;
-    color: #e43b04;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    display: none;
 }
 
 /* Filter Modal */
@@ -1014,6 +1016,17 @@
     /* Hide desktop filter buttons on mobile */
     .filter-group {
         display: none;
+    }
+    
+    /* Adjust filters bar layout for mobile */
+    .filters-bar {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .search-box {
+        flex: 1;
     }
 }
 

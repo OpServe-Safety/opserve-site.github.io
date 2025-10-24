@@ -796,13 +796,6 @@ function renderApplicationsView() {
         
         <!-- Filters -->
         <div class="filters-bar">
-            <!-- Mobile Filter Button -->
-            <button class="mobile-filter-btn" onclick="openFilterModal('applications')">
-                <i class="fas fa-filter"></i>
-                <span>Filters</span>
-                <span class="badge" id="appFilterBadge">All</span>
-            </button>
-            
             <!-- Desktop Filter Buttons -->
             <div class="filter-group">
                 <button class="filter-btn active" data-status="all">All</button>
@@ -819,6 +812,12 @@ function renderApplicationsView() {
                     placeholder="Search by name, email, or position..."
                 >
             </div>
+            <!-- Mobile Filter Button -->
+            <button class="mobile-filter-btn" onclick="openFilterModal('applications')">
+                <i class="fas fa-filter"></i>
+                <span>Filters</span>
+                <span class="badge" id="appFilterBadge">All</span>
+            </button>
         </div>
         
         <!-- Filter Modal -->
@@ -1869,6 +1868,7 @@ async function renderContactsView() {
         
         <!-- Filters -->
         <div class="filters-bar">
+            <!-- Desktop Filter Buttons -->
             <div class="filter-group">
                 <button class="filter-btn active" data-status="all">All</button>
                 <button class="filter-btn" data-status="new">New</button>
@@ -1884,6 +1884,12 @@ async function renderContactsView() {
                     placeholder="Search by name, email, company, or service..."
                 >
             </div>
+            <!-- Mobile Filter Button -->
+            <button class="mobile-filter-btn" onclick="openFilterModal('contacts')">
+                <i class="fas fa-filter"></i>
+                <span>Filters</span>
+                <span class="badge" id="contactFilterBadge">All</span>
+            </button>
         </div>
         
         <!-- Contacts Table -->
@@ -2073,6 +2079,7 @@ async function renderQuotesView() {
         
         <!-- Filters -->
         <div class="filters-bar">
+            <!-- Desktop Filter Buttons -->
             <div class="filter-group">
                 <button class="filter-btn active" data-status="all">All</button>
                 <button class="filter-btn" data-status="pending">Pending</button>
@@ -2087,6 +2094,12 @@ async function renderQuotesView() {
                     placeholder="Search by client, quote number, or service..."
                 >
             </div>
+            <!-- Mobile Filter Button -->
+            <button class="mobile-filter-btn" onclick="openFilterModal('quotes')">
+                <i class="fas fa-filter"></i>
+                <span>Filters</span>
+                <span class="badge" id="quoteFilterBadge">All</span>
+            </button>
         </div>
         
         <!-- Quotes Table -->
