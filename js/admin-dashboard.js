@@ -4625,7 +4625,6 @@ async function updateQuote(event, quoteId) {
                 event_date: eventDate,
                 event_duration: duration,
                 expected_attendance: venueSize,
-                personnel: personnel,
                 line_items: lineItems,
                 subtotal: subtotal,
                 tax: tax,
