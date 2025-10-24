@@ -413,8 +413,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (error) throw error;
                 
+                // Send confirmation email
+                try {
+                    const emailHTML = generateApplicationEmailHTML(firstName, formData.get('position'));
+                    await sendEmailViaResend(
+                        formData.get('email'),
+                        'Application Received - OpServe Safety Group',
+                        emailHTML
+                    );
+                } catch (emailError) {
+                    console.error('Failed to send confirmation email:', emailError);
+                    // Continue anyway - application was saved
+                }
+                
                 // Show success message
-                alert('Thank you for your application! We will review your information and get back to you soon.');
+                alert('Thank you for your application! We will review your information and get back to you soon. Check your email for confirmation.');
                 
                 // Reset form and close modal
                 this.reset();
@@ -437,6 +450,160 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Sorry, there was an error submitting your application. Please try again or email us directly.');
             }
         });
+    }
+
+    // ===== EMAIL FUNCTIONS =====
+    
+    // Send email via Resend API
+    async function sendEmailViaResend(to, subject, htmlContent) {
+        try {
+            // Get settings from admin dashboard
+            const { data: settingsData, error: settingsError } = await window.supabaseClient
+                .from('settings')
+                .select('value')
+                .eq('key', 'adminSettings')
+                .single();
+            
+            if (settingsError) throw settingsError;
+            
+            const settings = settingsData?.value || {};
+            const emailConfig = settings.integrations?.emailService || {};
+            
+            if (emailConfig.provider !== 'resend' || !emailConfig.apiKey) {
+                console.log('Email not configured, skipping automated email');
+                return;
+            }
+            
+            const fromEmail = emailConfig.fromEmail || 'noreply@opservesafetygroup.com';
+            
+            const response = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${emailConfig.apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    from: `OpServe Safety Group <${fromEmail}>`,
+                    to: [to],
+                    subject: subject,
+                    html: htmlContent
+                })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to send email');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Email send error:', error);
+            // Don't throw - we don't want to fail the submission if email fails
+        }
+    }
+    
+    // Generate application confirmation email
+    function generateApplicationEmailHTML(firstName, position) {
+        return `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background: #e43b04; color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                    .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+                    .button { display: inline-block; background: #e43b04; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+                    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+                    .highlight-box { background: #fff5f0; padding: 20px; border-left: 4px solid #e43b04; border-radius: 4px; margin: 20px 0; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>OpServe Safety Group</h1>
+                    <p>Professional Security Services</p>
+                </div>
+                <div class="content">
+                    <h2>Thank You for Your Application!</h2>
+                    <p>Dear ${firstName},</p>
+                    <p>We have successfully received your application for the <strong>${position}</strong> position at OpServe Safety Group.</p>
+                    
+                    <div class="highlight-box">
+                        <h3 style="margin-top: 0;">What Happens Next?</h3>
+                        <ol style="margin: 10px 0;">
+                            <li>Our recruitment team will review your application and qualifications</li>
+                            <li>If your skills match our requirements, we'll contact you for an interview</li>
+                            <li>We typically respond within 5-7 business days</li>
+                        </ol>
+                    </div>
+                    
+                    <p>We appreciate your interest in joining our team. OpServe Safety Group is committed to providing professional security services, and we're always looking for dedicated individuals to grow with us.</p>
+                    
+                    <p>If you have any questions in the meantime, please don't hesitate to reach out to us.</p>
+                    
+                    <p style="margin-top: 30px;">Best regards,<br><strong>OpServe Safety Group Recruitment Team</strong></p>
+                </div>
+                
+                <div class="footer">
+                    <p>OpServe Safety Group | Professional Security Services</p>
+                    <p><a href="https://opservesafetygroup.com">opservesafetygroup.com</a></p>
+                    <p>This is an automated message. Please do not reply to this email.</p>
+                </div>
+            </body>
+            </html>
+        `;
+    }
+    
+    // Generate contact confirmation email
+    function generateContactEmailHTML(name, service) {
+        return `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background: #e43b04; color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                    .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+                    .button { display: inline-block; background: #e43b04; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+                    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+                    .highlight-box { background: #fff5f0; padding: 20px; border-left: 4px solid #e43b04; border-radius: 4px; margin: 20px 0; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>OpServe Safety Group</h1>
+                    <p>Professional Security Services</p>
+                </div>
+                <div class="content">
+                    <h2>We Received Your Message!</h2>
+                    <p>Dear ${name},</p>
+                    <p>Thank you for contacting OpServe Safety Group. We have received your inquiry regarding <strong>${service}</strong>.</p>
+                    
+                    <div class="highlight-box">
+                        <h3 style="margin-top: 0;">What's Next?</h3>
+                        <p style="margin: 10px 0;">Our team will review your message and get back to you within 24-48 hours. We're committed to providing you with the professional security solutions you need.</p>
+                    </div>
+                    
+                    <p>In the meantime, feel free to explore our services and learn more about what makes OpServe Safety Group the trusted choice for security services:</p>
+                    
+                    <center>
+                        <a href="https://opservesafetygroup.com#services" class="button">View Our Services</a>
+                    </center>
+                    
+                    <p>For urgent matters, please call us directly.</p>
+                    
+                    <p style="margin-top: 30px;">Best regards,<br><strong>OpServe Safety Group Team</strong></p>
+                </div>
+                
+                <div class="footer">
+                    <p>OpServe Safety Group | Professional Security Services</p>
+                    <p><a href="https://opservesafetygroup.com">opservesafetygroup.com</a></p>
+                    <p>This is an automated message. Please do not reply to this email.</p>
+                </div>
+            </body>
+            </html>
+        `;
     }
 
     // ===== LOAD WEBSITE CONTENT FROM SETTINGS =====
@@ -901,8 +1068,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (error) throw error;
                 
+                // Send confirmation email
+                try {
+                    const emailHTML = generateContactEmailHTML(formData.get('name'), formData.get('service'));
+                    await sendEmailViaResend(
+                        formData.get('email'),
+                        'Message Received - OpServe Safety Group',
+                        emailHTML
+                    );
+                } catch (emailError) {
+                    console.error('Failed to send confirmation email:', emailError);
+                    // Continue anyway - contact was saved
+                }
+                
                 // Show success message
-                alert('Thank you for contacting us! We will get back to you as soon as possible.');
+                alert('Thank you for contacting us! We will get back to you as soon as possible. Check your email for confirmation.');
                 
                 // Reset form and close modal
                 this.reset();
