@@ -1816,7 +1816,66 @@ async function renderQuotesView() {
         
         if (error) throw error;
         
-        allQuotes = data || [];
+        // Transform database format to UI format
+        allQuotes = (data || []).map(quote => ({
+            id: quote.id,
+            quoteNumber: quote.quote_number,
+            contactId: quote.contact_id,
+            clientName: quote.client_name,
+            clientEmail: quote.client_email,
+            clientPhone: quote.client_phone,
+            service: quote.service,
+            serviceName: {
+                'event-security': 'Event Security',
+                'crowd-management': 'Crowd Management',
+                'executive-protection': 'Executive Protection',
+                'risk-assessment': 'Risk Assessment',
+                'other': 'Other'
+            }[quote.service] || quote.service,
+            details: {
+                eventDate: quote.event_date,
+                duration: quote.event_duration,
+                venueSize: quote.expected_attendance || 0,
+                personnel: quote.line_items ? 
+                    quote.line_items
+                        .filter(item => item.type === 'personnel')
+                        .reduce((acc, item) => {
+                            acc[item.description.split(' ')[0].toLowerCase()] = {
+                                label: item.description.split(' ')[0],
+                                count: item.quantity,
+                                rate: item.rate
+                            };
+                            return acc;
+                        }, {}) : {},
+                addons: quote.line_items ?
+                    quote.line_items
+                        .filter(item => item.type === 'addon')
+                        .map(item => item.description) : []
+            },
+            pricing: {
+                personnelCost: quote.line_items ?
+                    quote.line_items.filter(item => item.type === 'personnel')
+                        .reduce((sum, item) => sum + item.amount, 0) : 0,
+                addonsCost: quote.line_items ?
+                    quote.line_items.filter(item => item.type === 'addon')
+                        .reduce((sum, item) => sum + item.amount, 0) : 0,
+                subtotal: quote.subtotal,
+                tax: quote.tax,
+                taxRate: quote.tax / quote.subtotal,
+                taxState: quote.client_state,
+                total: quote.total
+            },
+            terms: {
+                paymentTerms: quote.notes || '',
+                validUntil: quote.valid_until
+            },
+            status: quote.status,
+            createdAt: quote.created_at,
+            sentAt: null,
+            viewedAt: null,
+            notes: []
+        }));
+        
         filteredQuotes = allQuotes;
     } catch (error) {
         console.error('Error loading quotes:', error);
@@ -3547,8 +3606,50 @@ async function createQuote(event, contactId) {
         
         if (error) throw error;
         
-        // Add to local array
-        allQuotes.push(data);
+        // Transform and add to local array
+        const transformedQuote = {
+            id: data.id,
+            quoteNumber: data.quote_number,
+            contactId: data.contact_id,
+            clientName: data.client_name,
+            clientEmail: data.client_email,
+            clientPhone: data.client_phone,
+            service: data.service,
+            serviceName: {
+                'event-security': 'Event Security',
+                'crowd-management': 'Crowd Management',
+                'executive-protection': 'Executive Protection',
+                'risk-assessment': 'Risk Assessment',
+                'other': 'Other'
+            }[data.service] || data.service,
+            details: {
+                eventDate: data.event_date,
+                duration: data.event_duration,
+                venueSize: data.expected_attendance || 0,
+                personnel: personnel,
+                addons: addons
+            },
+            pricing: {
+                personnelCost: personnelCost,
+                addonsCost: addonsCost,
+                subtotal: data.subtotal,
+                tax: data.tax,
+                taxRate: data.tax / data.subtotal,
+                taxState: data.client_state,
+                total: data.total
+            },
+            terms: {
+                paymentTerms: data.notes || '',
+                validUntil: data.valid_until
+            },
+            status: data.status,
+            createdAt: data.created_at,
+            sentAt: null,
+            viewedAt: null,
+            notes: []
+        };
+        
+        allQuotes.push(transformedQuote);
         
         // Close builder modal
         document.getElementById('quoteBuilderModal').style.display = 'none';
@@ -3564,7 +3665,7 @@ async function createQuote(event, contactId) {
             // Switch to quotes view and show the new quote
             switchView('quotes');
             setTimeout(() => {
-                viewQuoteDetail(data.id);
+                viewQuoteDetail(transformedQuote.id);
             }, 500);
         }
     } catch (error) {
