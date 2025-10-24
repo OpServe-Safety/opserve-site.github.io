@@ -1410,6 +1410,7 @@ input[type="date"]:focus {
     .form-row {
         flex-direction: column;
         gap: 15px;
+        margin-bottom: 20px;
     }
     
     .form-row .form-group {
