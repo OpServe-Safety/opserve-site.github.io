@@ -16,34 +16,52 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Apply Now Button:', applyNowBtn);
     
     // Function to load active positions from admin settings
-    function loadActivePositions() {
+    async function loadActivePositions() {
         const positionSelect = document.getElementById('position');
         if (!positionSelect) return;
         
-        // Get active positions from localStorage (set by admin)
-        const activePositionsData = localStorage.getItem('activePositions');
-        
-        if (activePositionsData) {
-            try {
-                const activePositions = JSON.parse(activePositionsData);
-                
-                // Clear existing options except the first one (placeholder)
-                const placeholder = positionSelect.options[0];
-                positionSelect.innerHTML = '';
-                positionSelect.appendChild(placeholder);
-                
-                // Add active positions
-                activePositions.forEach(pos => {
-                    const option = document.createElement('option');
-                    option.value = pos.value;
-                    option.textContent = pos.label;
-                    positionSelect.appendChild(option);
-                });
-                
-                console.log('Positions loaded from admin settings:', activePositions.length);
-            } catch (error) {
-                console.error('Error loading positions:', error);
+        try {
+            // Load positions from Supabase
+            const { data, error } = await window.supabaseClient
+                .from('settings')
+                .select('value')
+                .eq('key', 'positions')
+                .single();
+            
+            let positions = [];
+            
+            if (!error && data) {
+                // Filter to only active positions
+                positions = data.value.filter(pos => pos.active);
+            } else {
+                // Fallback to default positions if nothing in database
+                positions = [
+                    { value: 'admin', label: 'Admin' },
+                    { value: 'event-staff', label: 'Event Staff' },
+                    { value: 'agent', label: 'Agent' },
+                    { value: 'safety-agent', label: 'Safety Agent' },
+                    { value: 'safety-supervisor', label: 'Safety Supervisor' },
+                    { value: 'manager', label: 'Manager' },
+                    { value: 'other', label: 'Other' }
+                ];
             }
+            
+            // Clear existing options except the first one (placeholder)
+            const placeholder = positionSelect.options[0];
+            positionSelect.innerHTML = '';
+            positionSelect.appendChild(placeholder);
+            
+            // Add active positions
+            positions.forEach(pos => {
+                const option = document.createElement('option');
+                option.value = pos.value;
+                option.textContent = pos.label;
+                positionSelect.appendChild(option);
+            });
+            
+            console.log('Positions loaded from Supabase:', positions.length);
+        } catch (error) {
+            console.error('Error loading positions:', error);
         }
     }
     
