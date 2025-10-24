@@ -3397,6 +3397,9 @@ function renderQuotesTable(quotes) {
                         <button class="btn-icon" onclick="viewQuoteDetail('${quote.id}')" title="View quote">
                             <i class="fas fa-eye"></i>
                         </button>
+                        <button class="btn-icon" onclick="editQuote('${quote.id}')" title="Edit Quote" style="color: #2196F3;">
+                            <i class="fas fa-edit"></i>
+                        </button>
                         <button class="btn-icon" onclick="deleteQuote('${quote.id}')" title="Delete Quote" style="color: #dc3545;">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -3965,6 +3968,159 @@ function downloadQuotePDF(id) {
     }, 500);
 }
 
+// Edit existing quote
+function editQuote(quoteId) {
+    const quote = allQuotes.find(q => q.id === quoteId);
+    if (!quote) return;
+    
+    const modal = document.getElementById('quoteBuilderModal');
+    const modalContent = document.getElementById('quoteBuilderContent');
+    
+    // Get settings from localStorage
+    const settings = JSON.parse(localStorage.getItem('adminSettings')) || {};
+    const template = servicePricingTemplates[quote.service] || {};
+    
+    // Pre-fill personnel quantities and rates from existing quote
+    const personnelHTML = settings.positions.filter(pos => pos.value !== 'other').map(position => {
+        const existingPersonnel = quote.personnel?.[position.value];
+        const qty = existingPersonnel?.count || 0;
+        const rate = existingPersonnel?.rate || settings.quoteSettings.positionRates[position.value] || 35;
+        
+        return `
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 10px; padding: 10px; background: white; border-radius: 8px;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">${position.label}</label>
+                    <input type="number" id="qty_${position.value}" value="${qty}" min="0" 
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;" 
+                           onchange="calculateQuoteTotal()">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Rate/hour</label>
+                    <input type="number" id="rate_${position.value}" value="${rate}" min="0" step="0.01" 
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;" 
+                           onchange="calculateQuoteTotal()">
+                </div>
+                <div style="display: flex; align-items: flex-end;">
+                    <span id="total_${position.value}" style="font-weight: 600; color: #666;">$${(qty * rate * (quote.details?.duration || 1)).toFixed(2)}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Check which addons were selected
+    const selectedAddons = quote.details?.addons || [];
+    const addonsHTML = (template.addons || []).map(addon => `
+        <label style="display: flex; align-items: center; padding: 10px; background: #f8f9fa; margin-bottom: 10px; border-radius: 8px; cursor: pointer;">
+            <input type="checkbox" value="${addon.id}" ${selectedAddons.includes(addon.id) ? 'checked' : ''} onchange="calculateQuoteTotal()" style="margin-right: 10px;">
+            <span style="flex: 1;">${addon.name} (${addon.unit})</span>
+            <span style="font-weight: 600; color: #e43b04;">+$${addon.price}</span>
+        </label>
+    `).join('');
+    
+    modalContent.innerHTML = `
+        <h2 style="margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #e0e0e0;">
+            <i class="fas fa-edit" style="color: #2196F3;"></i> Edit Quote #${quote.quoteNumber}
+        </h2>
+        
+        <form id="quoteBuilderForm" onsubmit="updateQuote(event, '${quoteId}')">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                <div>
+                    <h4 style="color: #666; margin-bottom: 15px;">CLIENT INFORMATION</h4>
+                    <p style="margin: 5px 0;"><strong>${quote.clientName}</strong></p>
+                    <p style="margin: 5px 0; color: #666;">${quote.clientEmail}</p>
+                    <p style="margin: 5px 0; color: #666;"><i class="fas fa-map-marker-alt" style="color: #e43b04;"></i> ${quote.clientState || 'State not provided'}</p>
+                </div>
+                <div>
+                    <h4 style="color: #666; margin-bottom: 15px;">SERVICE</h4>
+                    <p style="margin: 5px 0;"><i class="fas ${getServiceIcon(quote.service)}" style="color: #e43b04;"></i> ${quote.serviceName}</p>
+                </div>
+            </div>
+            
+            <input type="hidden" id="clientState" value="${quote.clientState || ''}">
+            <input type="hidden" id="quoteIdForUpdate" value="${quoteId}">
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                <h3 style="margin-bottom: 15px;">Event Details</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Event Date</label>
+                        <input type="date" id="eventDate" value="${quote.details?.eventDate || ''}" required 
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Duration (hours)</label>
+                        <input type="number" id="duration" value="${quote.details?.duration || 8}" min="1" step="0.5" required 
+                               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;" 
+                               onchange="calculateQuoteTotal()">
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Venue Size (optional)</label>
+                    <input type="number" id="venueSize" value="${quote.details?.venueSize || ''}" placeholder="Number of attendees" 
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h3 style="margin-bottom: 15px;">Personnel</h3>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">Select number of personnel needed for each position</p>
+                ${personnelHTML}
+            </div>
+            
+            ${addonsHTML ? `
+            <div style="margin-bottom: 25px;">
+                <h3 style="margin-bottom: 15px;">Add-ons</h3>
+                ${addonsHTML}
+            </div>
+            ` : ''}
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                <h3 style="margin-bottom: 15px;">Payment Terms</h3>
+                <select id="paymentTerms" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    ${settings.quoteSettings.paymentTerms.map(term => 
+                        `<option value="${term}" ${quote.details?.paymentTerms === term ? 'selected' : ''}>${term}</option>`
+                    ).join('')}
+                </select>
+            </div>
+            
+            <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                <h3 style="margin-bottom: 15px; color: #2e7d32;">Quote Summary</h3>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #c8e6c9;">
+                    <span>Subtotal:</span>
+                    <strong id="quoteSummarySubtotal">$${quote.pricing?.subtotal?.toFixed(2) || '0.00'}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #c8e6c9;">
+                    <span>Tax (${(quote.pricing?.taxRate * 100 || 0).toFixed(1)}%): 
+                        <input type="number" id="taxRateOverride" value="${(quote.pricing?.taxRate * 100 || settings.quoteSettings.defaultTaxRate * 100).toFixed(1)}" min="0" max="100" step="0.1" 
+                               style="width: 80px; padding: 5px; border: 2px solid #e0e0e0; border-radius: 4px; margin-left: 5px;" 
+                               onchange="calculateQuoteTotal()">%
+                    </span>
+                    <strong id="quoteSummaryTax">$${quote.pricing?.tax?.toFixed(2) || '0.00'}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+                    <span>TOTAL:</span>
+                    <strong id="quoteSummaryTotal" style="color: #e43b04;">$${quote.pricing?.total?.toFixed(2) || '0.00'}</strong>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button type="submit" class="btn btn-primary" style="padding: 12px 30px; font-size: 1rem;">
+                    <i class="fas fa-save"></i> Update Quote
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('quoteBuilderModal').style.display='none'" 
+                        style="padding: 12px 30px; font-size: 1rem; margin-left: 10px;">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    `;
+    
+    modal.style.display = 'flex';
+    
+    // Calculate total on load
+    setTimeout(() => calculateQuoteTotal(), 100);
+}
+
 // Open quote builder from a contact/message
 function openQuoteBuilder(contactId) {
     const contact = allContacts.find(c => c.id === contactId);
@@ -4377,6 +4533,154 @@ async function createQuote(event, contactId) {
     } catch (error) {
         console.error('Error creating quote:', error);
         showError('Failed to create quote: ' + error.message);
+    }
+}
+
+// Update existing quote
+async function updateQuote(event, quoteId) {
+    event.preventDefault();
+    
+    const quote = allQuotes.find(q => q.id === quoteId);
+    if (!quote) return;
+    
+    const template = servicePricingTemplates[quote.service];
+    
+    // Get settings
+    const settings = JSON.parse(localStorage.getItem('adminSettings'));
+    
+    // Get form values
+    const duration = parseFloat(document.getElementById('duration').value);
+    const eventDate = document.getElementById('eventDate').value;
+    const venueSize = parseInt(document.getElementById('venueSize')?.value || 0);
+    const paymentTerms = document.getElementById('paymentTerms').value;
+    
+    // Collect personnel data
+    const personnel = {};
+    settings.positions.filter(pos => pos.value !== 'other').forEach(position => {
+        const qty = parseInt(document.getElementById(`qty_${position.value}`).value);
+        const rate = parseFloat(document.getElementById(`rate_${position.value}`).value);
+        if (qty > 0) {
+            personnel[position.value] = {
+                label: position.label,
+                count: qty,
+                rate: rate
+            };
+        }
+    });
+    
+    // Get selected add-ons
+    const addons = [];
+    document.querySelectorAll('#quoteBuilderForm input[type="checkbox"]:checked').forEach(checkbox => {
+        addons.push(checkbox.value);
+    });
+    
+    // Calculate pricing
+    let personnelCost = 0;
+    Object.values(personnel).forEach(pos => {
+        personnelCost += pos.count * pos.rate * duration;
+    });
+    
+    let addonsCost = 0;
+    addons.forEach(addonId => {
+        const addon = template.addons.find(a => a.id === addonId);
+        if (addon) addonsCost += addon.price;
+    });
+    
+    const taxRateInput = document.getElementById('taxRateOverride');
+    const taxRateUsed = taxRateInput ? parseFloat(taxRateInput.value) / 100 : settings.quoteSettings.defaultTaxRate;
+    
+    const subtotal = personnelCost + addonsCost;
+    const tax = subtotal * taxRateUsed;
+    const total = subtotal + tax;
+    
+    // Build line items
+    const lineItems = [];
+    Object.entries(personnel).forEach(([key, pos]) => {
+        lineItems.push({
+            type: 'personnel',
+            description: `${pos.label} (${pos.count} x ${duration} hrs)`,
+            quantity: pos.count,
+            rate: pos.rate,
+            hours: duration,
+            amount: pos.count * pos.rate * duration
+        });
+    });
+    
+    addons.forEach(addonId => {
+        const addon = template.addons.find(a => a.id === addonId);
+        if (addon) {
+            lineItems.push({
+                type: 'addon',
+                description: addon.name,
+                quantity: 1,
+                rate: addon.price,
+                hours: 1,
+                amount: addon.price
+            });
+        }
+    });
+    
+    try {
+        // Update in Supabase
+        const { error } = await window.supabaseClient
+            .from('quotes')
+            .update({
+                event_date: eventDate,
+                event_duration: duration,
+                expected_attendance: venueSize,
+                personnel: personnel,
+                line_items: lineItems,
+                subtotal: subtotal,
+                tax: tax,
+                total: total,
+                notes: paymentTerms,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', quoteId);
+        
+        if (error) throw error;
+        
+        // Update local quote object
+        const quoteIndex = allQuotes.findIndex(q => q.id === quoteId);
+        if (quoteIndex !== -1) {
+            allQuotes[quoteIndex] = {
+                ...allQuotes[quoteIndex],
+                personnel: personnel,
+                details: {
+                    eventDate: eventDate,
+                    duration: duration,
+                    venueSize: venueSize,
+                    personnel: personnel,
+                    addons: addons,
+                    paymentTerms: paymentTerms
+                },
+                pricing: {
+                    personnelCost: personnelCost,
+                    addonsCost: addonsCost,
+                    subtotal: subtotal,
+                    tax: tax,
+                    taxRate: taxRateUsed,
+                    taxState: quote.clientState,
+                    total: total
+                },
+                updatedAt: new Date().toISOString()
+            };
+        }
+        
+        // Close modal
+        document.getElementById('quoteBuilderModal').style.display = 'none';
+        
+        // Show success
+        showSaveNotification(`Quote #${quote.quoteNumber} updated successfully!`);
+        
+        // Refresh quotes view
+        if (currentView === 'quotes') {
+            renderQuotesView();
+        }
+        
+    } catch (error) {
+        console.error('Error updating quote:', error);
+        showError('Failed to update quote: ' + error.message);
     }
 }
 
