@@ -1615,12 +1615,25 @@ function initializeCollapsibleSections() {
 }
 
 // Render contacts view
-function renderContactsView() {
+async function renderContactsView() {
     const mainContent = document.querySelector('.dashboard-main');
     
-    // Load sample contacts (will be replaced with Supabase data)
-    allContacts = getSampleContacts();
-    filteredContacts = allContacts;
+    // Load contacts from Supabase
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('contacts')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        allContacts = data || [];
+        filteredContacts = allContacts;
+    } catch (error) {
+        console.error('Error loading contacts:', error);
+        allContacts = [];
+        filteredContacts = [];
+    }
     
     // Calculate stats
     const stats = {
@@ -2230,18 +2243,25 @@ function renderContactsTable(contacts) {
     emptyState.style.display = 'none';
     
     tbody.innerHTML = contacts.map(contact => {
-        const date = new Date(contact.createdAt);
-        const displayName = contact.company || contact.name;
+        const date = new Date(contact.created_at);
+        const serviceNames = {
+            'event-security': 'Event Security',
+            'crowd-management': 'Crowd Management',
+            'executive-protection': 'Executive Protection',
+            'risk-assessment': 'Risk Assessment',
+            'other': 'Other'
+        };
+        const serviceName = serviceNames[contact.service] || contact.service;
         
         return `
             <tr>
                 <td>
-                    <strong>${displayName}</strong>
-                    ${contact.company ? `<br><small style="color: #666;">${contact.name}</small>` : ''}
+                    <strong>${contact.name}</strong>
+                    <br><small style="color: #666;">${contact.state}</small>
                 </td>
                 <td>
                     <span class="badge badge-info">
-                        <i class="fas ${getServiceIcon(contact.service)}" style="color: #e43b04;"></i> ${contact.serviceName}
+                        <i class="fas ${getServiceIcon(contact.service)}" style="color: #e43b04;"></i> ${serviceName}
                     </span>
                 </td>
                 <td>
@@ -2253,9 +2273,14 @@ function renderContactsTable(contacts) {
                 <td>${date.toLocaleDateString()}</td>
                 <td>${getContactStatusBadge(contact.status)}</td>
                 <td>
-                    <button class="btn btn-icon" onclick="viewContactDetail('${contact.id}')" title="View details">
-                        <i class="fas fa-eye"></i>
-                    </button>
+                    <div class="action-btns">
+                        <button class="btn-icon" onclick="viewContactDetail('${contact.id}')" title="View details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon" onclick="deleteContact('${contact.id}')" title="Delete Contact" style="color: #dc3545;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -2381,8 +2406,15 @@ function viewContactDetail(id) {
     const modal = document.getElementById('contactModal');
     const modalContent = document.getElementById('contactModalContent');
     
-    const date = new Date(contact.createdAt);
-    const displayName = contact.company || contact.name;
+    const date = new Date(contact.created_at);
+    const serviceNames = {
+        'event-security': 'Event Security',
+        'crowd-management': 'Crowd Management',
+        'executive-protection': 'Executive Protection',
+        'risk-assessment': 'Risk Assessment',
+        'other': 'Other'
+    };
+    const serviceName = serviceNames[contact.service] || contact.service;
     
     modalContent.innerHTML = `
         <h2 style="margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #e0e0e0;">Message Details</h2>
@@ -2391,7 +2423,7 @@ function viewContactDetail(id) {
             <h3><i class="fas fa-user" style="color: #e43b04;"></i> Contact Information</h3>
             <div style="margin-top: 10px;">
                 <p style="margin: 8px 0;"><strong>Name:</strong> ${contact.name}</p>
-                ${contact.company ? `<p style="margin: 8px 0;"><strong>Company:</strong> ${contact.company}</p>` : ''}
+                <p style="margin: 8px 0;"><strong>State:</strong> ${contact.state}</p>
                 <p style="margin: 8px 0;"><strong>Email:</strong> <a href="mailto:${contact.email}" style="color: #e43b04;">${contact.email}</a></p>
                 <p style="margin: 8px 0;"><strong>Phone:</strong> <a href="tel:${contact.phone}" style="color: #e43b04;">${contact.phone}</a></p>
             </div>
@@ -2399,7 +2431,7 @@ function viewContactDetail(id) {
         
         <div class="detail-section" style="margin-top: 25px;">
             <h3><i class="fas fa-briefcase" style="color: #e43b04;"></i> Service Requested</h3>
-            <p style="margin-top: 10px;"><i class="fas ${getServiceIcon(contact.service)}" style="color: #e43b04; margin-right: 8px;"></i>${contact.serviceName}</p>
+            <p style="margin-top: 10px;"><i class="fas ${getServiceIcon(contact.service)}" style="color: #e43b04; margin-right: 8px;"></i>${serviceName}</p>
         </div>
         
         <div class="detail-section" style="margin-top: 25px;">
@@ -2426,19 +2458,14 @@ function viewContactDetail(id) {
         
         <div class="detail-section" style="margin-top: 25px;">
             <h3><i class="fas fa-sticky-note" style="color: #e43b04;"></i> Admin Notes</h3>
-            ${contact.notes.length > 0 ? `
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 10px; margin-bottom: 15px;">
-                    ${contact.notes.map(note => `
-                        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0; last-child:border-bottom: none;">
-                            <p style="margin: 0 0 5px 0; line-height: 1.6;">${note.text}</p>
-                            <small style="color: #999;">${new Date(note.timestamp).toLocaleString()}</small>
-                        </div>
-                    `).join('')}
+            ${contact.notes ? `
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 10px; margin-bottom: 15px; white-space: pre-wrap;">
+                    ${contact.notes}
                 </div>
-            ` : ''}
+            ` : '<p style="color: #999; margin-top: 10px;">No notes yet</p>'}
             <textarea id="newContactNote" rows="3" placeholder="Add a note..."
                       style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; margin-top: 10px; font-size: 1rem;"></textarea>
-            <button class="btn btn-secondary" onclick="addContactNote('${id}')" style="margin-top: 15px; background: #e43b04; border-color: #e43b04; color: white;">
+            <button class="btn btn-secondary" onclick="addContactNote('${id}')" style="margin: 8px; padding: 12px 24px; background: #e43b04; border-color: #e43b04; color: white;">
                 <i class="fas fa-plus"></i> Add Note
             </button>
         </div>
@@ -2448,7 +2475,7 @@ function viewContactDetail(id) {
             <button class="btn btn-primary" onclick="openQuoteBuilder('${id}')" style="margin: 8px; padding: 12px 24px; background: #28a745; border-color: #28a745;">
                 <i class="fas fa-file-invoice-dollar"></i> Generate Quote
             </button>
-            <a href="mailto:${contact.email}?subject=Re: Your inquiry about ${contact.serviceName}" 
+            <a href="mailto:${contact.email}?subject=Re: Your inquiry about ${serviceName}" 
                class="btn btn-primary" style="margin: 8px; padding: 12px 24px;">
                 <i class="fas fa-envelope"></i> Email Reply
             </a>
@@ -2479,6 +2506,40 @@ function updateContactStatus(id, newStatus) {
     viewContactDetail(id);
     
     showSaveNotification('Contact status updated!');
+}
+
+// Delete contact
+async function deleteContact(id) {
+    const contact = allContacts.find(c => c.id === id);
+    if (!contact) return;
+    
+    const confirmMsg = `Are you sure you want to delete this contact from ${contact.name}?\n\nThis action cannot be undone.`;
+    
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+    
+    try {
+        // Delete from Supabase
+        const { error } = await window.supabaseClient
+            .from('contacts')
+            .delete()
+            .eq('id', id);
+        
+        if (error) throw error;
+        
+        // Remove from local array
+        allContacts = allContacts.filter(c => c.id !== id);
+        filteredContacts = filteredContacts.filter(c => c.id !== id);
+        
+        // Re-render
+        renderContactsTable(filteredContacts);
+        
+        showSuccess('Contact deleted successfully');
+    } catch (error) {
+        console.error('Error deleting contact:', error);
+        showError('Failed to delete contact: ' + error.message);
+    }
 }
 
 // Add note to contact
