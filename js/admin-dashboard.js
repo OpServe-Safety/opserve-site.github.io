@@ -560,7 +560,8 @@ async function initializeSettings() {
             },
             emailService: {
                 provider: 'none', // none, sendgrid, mailgun, resend
-                apiKey: ''
+                apiKey: '',
+                fromEmail: 'noreply@opservesafetygroup.com'
             },
             analytics: {
                 googleAnalyticsId: '',
@@ -1669,8 +1670,22 @@ function renderSettingsView() {
                     <label class="setting-label-full">API Key</label>
                     <input type="password" id="emailApiKey" value="${settings.integrations.emailService.apiKey}" 
                            onchange="updateIntegrationSetting('emailService', 'apiKey', this.value)"
-                           placeholder="Enter your API key"
+                           placeholder="Enter your Resend API key"
                            style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace;">
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Get your API key from <a href="https://resend.com/api-keys" target="_blank">Resend Dashboard</a>
+                    </small>
+                </div>
+                
+                <div class="setting-row">
+                    <label class="setting-label-full">From Email Address</label>
+                    <input type="email" id="emailFromAddress" value="${settings.integrations.emailService.fromEmail || 'noreply@opservesafetygroup.com'}" 
+                           onchange="updateIntegrationSetting('emailService', 'fromEmail', this.value)"
+                           placeholder="noreply@opservesafetygroup.com"
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <small style="display: block; color: #666; margin-top: 5px;">
+                        <i class="fas fa-envelope"></i> Email address to send from (must be verified in Resend)
+                    </small>
                 </div>
                 
                 <!-- Google Analytics -->
@@ -4216,6 +4231,146 @@ async function createQuote(event, contactId) {
     }
 }
 
+// Send email via Resend API
+async function sendEmailViaResend(to, subject, htmlContent) {
+    const settings = JSON.parse(localStorage.getItem('adminSettings'));
+    const emailConfig = settings.integrations.emailService;
+    
+    if (emailConfig.provider !== 'resend' || !emailConfig.apiKey) {
+        throw new Error('Resend is not configured. Please add your API key in Settings.');
+    }
+    
+    const fromEmail = emailConfig.fromEmail || 'noreply@opservesafetygroup.com';
+    
+    try {
+        const response = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${emailConfig.apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                from: `OpServe Safety Group <${fromEmail}>`,
+                to: [to],
+                subject: subject,
+                html: htmlContent
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to send email');
+        }
+        
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.error('Email send error:', error);
+        throw error;
+    }
+}
+
+// Generate HTML email for quote
+function generateQuoteEmailHTML(quote) {
+    const eventDate = new Date(quote.details.eventDate);
+    const validUntil = new Date(quote.terms.validUntil);
+    
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: #e43b04; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+                .quote-number { font-size: 24px; font-weight: bold; color: #e43b04; margin: 20px 0; }
+                .info-section { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+                .pricing-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                .pricing-table td { padding: 10px; border-bottom: 1px solid #e0e0e0; }
+                .total-row { font-size: 18px; font-weight: bold; color: #e43b04; border-top: 2px solid #e43b04; }
+                .button { display: inline-block; background: #e43b04; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+                .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>OpServe Safety Group</h1>
+                <p>Professional Security Services</p>
+            </div>
+            <div class="content">
+                <h2>Your Quote is Ready</h2>
+                <p>Dear ${quote.clientName},</p>
+                <p>Thank you for your interest in OpServe Safety Group. We're pleased to provide you with the following quote:</p>
+                
+                <div class="quote-number">Quote #${quote.quoteNumber}</div>
+                
+                <div class="info-section">
+                    <h3>${quote.serviceName}</h3>
+                    <p><strong>Event Date:</strong> ${eventDate.toLocaleDateString()}</p>
+                    <p><strong>Duration:</strong> ${quote.details.duration} hours</p>
+                    ${quote.details.venueSize > 0 ? `<p><strong>Venue Size:</strong> ${quote.details.venueSize.toLocaleString()} people</p>` : ''}
+                </div>
+                
+                <h3>Personnel</h3>
+                <table class="pricing-table">
+                    ${Object.entries(quote.details.personnel).map(([key, pos]) => `
+                        <tr>
+                            <td>${pos.label} (${pos.count} × $${pos.rate}/hr × ${quote.details.duration}hrs)</td>
+                            <td style="text-align: right;">$${(pos.count * pos.rate * quote.details.duration).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+                
+                ${quote.pricing.addonsCost > 0 ? `
+                <h3>Additional Services</h3>
+                <table class="pricing-table">
+                    ${quote.details.addons.map(addon => `
+                        <tr>
+                            <td>${addon.name || addon.label || 'Additional Service'}</td>
+                            <td style="text-align: right;">$${parseFloat(addon.price || addon.amount || 0).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+                ` : ''}
+                
+                <table class="pricing-table">
+                    <tr>
+                        <td><strong>Subtotal:</strong></td>
+                        <td style="text-align: right;">$${quote.pricing.subtotal.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td>Tax (${((quote.pricing.taxRate || 0.06) * 100).toFixed(2)}%):</td>
+                        <td style="text-align: right;">$${quote.pricing.tax.toFixed(2)}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>TOTAL:</td>
+                        <td style="text-align: right;">$${quote.pricing.total.toFixed(2)}</td>
+                    </tr>
+                </table>
+                
+                <p style="background: #fff5f0; padding: 15px; border-left: 4px solid #e43b04; border-radius: 4px;">
+                    <strong>Payment Terms:</strong> ${quote.terms.paymentTerms}
+                </p>
+                
+                <p>This quote is valid until <strong>${validUntil.toLocaleDateString()}</strong>.</p>
+                
+                <center>
+                    <a href="mailto:contact@opservesafetygroup.com" class="button">Accept Quote</a>
+                </center>
+                
+                <p>If you have any questions or would like to discuss this quote further, please don't hesitate to contact us.</p>
+            </div>
+            
+            <div class="footer">
+                <p>OpServe Safety Group | Professional Security Services</p>
+                <p>This email was sent to ${quote.clientEmail}</p>
+            </div>
+        </body>
+        </html>
+    `;
+}
+
 // Send quote
 async function sendQuote(id) {
     const quote = allQuotes.find(q => q.id === id);
@@ -4238,12 +4393,25 @@ async function sendQuote(id) {
             quote.status = 'sent';
             quote.sentAt = new Date().toISOString();
             
-            // TODO: Implement email sending via Supabase Edge Function or email service
-            // For now, just update status. Email functionality can be added later.
-            
-            filterQuotes(currentQuoteFilter);
-            viewQuoteDetail(id);
-            showSaveNotification('Quote marked as sent! (Email functionality coming soon)');
+            // Send email via Resend
+            try {
+                const emailHTML = generateQuoteEmailHTML(quote);
+                await sendEmailViaResend(
+                    quote.clientEmail,
+                    `Quote #${quote.quoteNumber} - ${quote.serviceName}`,
+                    emailHTML
+                );
+                
+                filterQuotes(currentQuoteFilter);
+                viewQuoteDetail(id);
+                showSaveNotification(`✅ Quote sent successfully to ${quote.clientEmail}!`);
+            } catch (emailError) {
+                console.error('Email sending failed:', emailError);
+                // Quote status was updated, but email failed
+                filterQuotes(currentQuoteFilter);
+                viewQuoteDetail(id);
+                showSaveNotification(`⚠️ Quote marked as sent, but email failed: ${emailError.message}`);
+            }
         } catch (error) {
             console.error('Error sending quote:', error);
             showError('Failed to send quote: ' + error.message);
