@@ -842,8 +842,22 @@ function renderApplicationsView() {
     });
 }
 
+// Store which sections are currently open
+let openSettingsSections = [];
+
 // Render settings view
 function renderSettingsView() {
+    // Save current open sections before re-rendering
+    const sections = document.querySelectorAll('.settings-section');
+    openSettingsSections = [];
+    sections.forEach(section => {
+        const content = section.querySelector('.section-content');
+        const header = section.querySelector('h2');
+        if (content && header && content.style.display === 'block') {
+            openSettingsSections.push(header.textContent.trim());
+        }
+    });
+    
     let settings = JSON.parse(localStorage.getItem('adminSettings'));
     
     // Ensure quoteSettings exists
@@ -1068,11 +1082,23 @@ function renderSettingsView() {
                 </div>
                 
                 <div class="setting-row">
-                    <label class="setting-label-full">Team Photo URL</label>
-                    <input type="text" id="aboutImage" value="${settings.websiteContent.about.teamImage}" 
-                           onchange="updateWebsiteContent('about', 'teamImage', this.value)"
-                           placeholder="images/team-photo.jpg"
-                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <label class="setting-label-full">Team Photo</label>
+                    <div style="display: flex; gap: 15px; align-items: start;">
+                        <div style="flex: 1;">
+                            <input type="file" id="aboutImageFile" accept="image/*" 
+                                   onchange="uploadWebsiteImage('about', 'teamImage', this.files[0], this)"
+                                   style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <small style="display: block; color: #6c757d; margin-top: 5px;">Upload a team photo (JPG, PNG, WebP)</small>
+                            <div id="aboutImageUploadStatus" style="margin-top: 10px; font-size: 0.9rem;"></div>
+                        </div>
+                        ${settings.websiteContent.about.teamImage ? `
+                        <div style="width: 150px;">
+                            <img src="${settings.websiteContent.about.teamImage}" alt="Current team photo" 
+                                 style="width: 100%; height: auto; border-radius: 8px; border: 2px solid #e0e0e0;">
+                            <small style="display: block; color: #6c757d; margin-top: 5px; text-align: center;">Current photo</small>
+                        </div>
+                        ` : ''}
+                    </div>
                 </div>
                 
                 <!-- Services Section -->
@@ -1670,8 +1696,19 @@ function initializeCollapsibleSections() {
             header.style.cursor = 'pointer';
             header.style.userSelect = 'none';
             
-            // Collapse by default
-            content.style.display = 'none';
+            // Check if this section was previously open
+            const sectionTitle = header.textContent.trim().replace(/\s+/g, ' ');
+            const shouldBeOpen = openSettingsSections.some(title => 
+                sectionTitle.includes(title.split(' ')[0]) // Match first word (icon might change text)
+            );
+            
+            // Collapse by default, unless it was previously open
+            if (shouldBeOpen) {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+            }
             
             // Prevent clicks inside content from bubbling to header
             content.addEventListener('click', function(e) {
