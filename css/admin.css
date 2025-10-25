@@ -1159,47 +1159,61 @@
         font-size: 0.85rem;
     }
     
-    /* Service Addon Rows - Mobile Optimization */
+    /* Service Addon Rows - Mobile Vertical Stack Layout */
     .addon-row {
-        grid-template-columns: 1fr 45px 0.85fr 32px;
-        gap: 3px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        position: relative;
     }
     
     .addon-input {
-        padding: 5px 3px;
-        font-size: 10px;
+        padding: 10px;
+        font-size: 14px;
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 6px;
     }
     
     .addon-name-input {
-        font-size: 11px;
-        padding: 5px 4px;
+        font-size: 15px;
+        font-weight: 500;
+        padding: 10px;
     }
     
-    .addon-price-input {
-        width: 45px;
-        max-width: 45px;
-        min-width: 45px;
-        padding: 5px 2px;
-        font-size: 10px;
-        text-align: center;
-    }
-    
+    .addon-price-input,
     .addon-unit-input {
-        font-size: 9px;
-        padding: 5px 3px;
+        padding: 10px;
+        font-size: 14px;
         width: 100%;
     }
     
     .addon-delete-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
         width: 32px;
+        height: 32px;
         min-width: 32px;
-        padding: 4px;
+        padding: 6px;
+        background: #dc3545;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .addon-row .add-position-btn {
-        width: 32px;
-        min-width: 32px;
-        padding: 4px;
+        width: 100%;
+        padding: 12px;
+        margin-top: 4px;
+        font-size: 14px;
     }
     
     /* Reduce padding on addon containers */
