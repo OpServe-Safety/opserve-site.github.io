@@ -1038,6 +1038,16 @@
     .search-box {
         flex: 1;
     }
+    
+    /* Service Addon Rows - Tablet Optimization */
+    .addon-row {
+        grid-template-columns: 2fr 0.6fr 0.9fr 36px !important;
+        gap: 8px !important;
+    }
+    
+    .addon-row input {
+        font-size: 13px !important;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1111,21 +1121,23 @@
     
     /* Service Addon Rows - Mobile Optimization */
     .addon-row {
-        grid-template-columns: 2fr 0.5fr 0.6fr 36px !important;
-        gap: 6px !important;
+        grid-template-columns: 1.8fr 0.4fr 0.8fr 36px !important;
+        gap: 5px !important;
     }
     
     .addon-row input {
-        padding: 6px 4px !important;
-        font-size: 12px !important;
+        padding: 6px 3px !important;
+        font-size: 11px !important;
     }
     
     .addon-row input[type="number"] {
         width: 100%;
-        min-width: 50px;
+        min-width: 45px;
+        text-align: center;
     }
     
     .addon-row input[type="text"]:last-of-type {
-        font-size: 11px !important;
+        font-size: 10px !important;
+        padding: 6px 2px !important;
     }
 }
