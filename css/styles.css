@@ -894,7 +894,7 @@ header .btn:focus {
         width: 60%;
         max-width: 280px;
         height: 100vh;
-        background: linear-gradient(to left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+        background: linear-gradient(to left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
         flex-direction: column;
         justify-content: flex-start;
         align-items: flex-end;
