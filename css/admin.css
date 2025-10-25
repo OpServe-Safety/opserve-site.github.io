@@ -1113,8 +1113,8 @@
     }
     
     .dashboard-main {
-        margin: 0;
-        padding: 60px 0 0 0;
+        margin: 0 !important;
+        padding: 60px 0 0 0 !important;
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
@@ -1405,10 +1405,10 @@
         border-radius: 12px;
     }
     
-    /* Settings container - full width, zero padding on mobile */
+    /* Settings container - full width, zero side padding, top spacing for header */
     .settings-container {
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 20px 0 0 0 !important;
         max-width: 100%;
         width: 100%;
     }
