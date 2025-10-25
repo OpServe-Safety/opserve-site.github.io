@@ -2248,11 +2248,11 @@ function initializeKeyringLock() {
             return;
         }
         
-        // Reset after 3 seconds of no taps
+        // Reset after 5 seconds of no taps
         keyringTapTimer = setTimeout(() => {
             keyringTapCount = 0;
             lockIndicator.style.opacity = 0.5;
-        }, 3000);
+        }, 5000);
     });
 }
 
@@ -2466,7 +2466,7 @@ function applyKeyringLockState(keyringSection, locked) {
                 <div style="text-align: center; color: #666;">
                     <i class="fas fa-lock" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
                     <p style="margin: 0; font-weight: 600;">Section Locked</p>
-                    <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.7;">Tap title 17 times to unlock</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.7;">Tap title 17+ times in 5 seconds</p>
                 </div>
             `;
             
