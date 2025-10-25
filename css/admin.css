@@ -1232,7 +1232,7 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        z-index: 1002;
+        z-index: 1003;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
@@ -1425,13 +1425,18 @@
     /* Ensure sidebar logo is visible and properly sized on mobile */
     .dashboard-sidebar .dashboard-logo {
         display: block !important;
-        padding: 10px;
+        padding: 0;
     }
     
     .dashboard-sidebar .dashboard-logo img {
         width: 38.4px !important;
         height: auto;
         margin: 0 auto;
+    }
+    
+    /* Sidebar needs to be above header */
+    .dashboard-sidebar {
+        z-index: 1002 !important;
     }
     
     /* Dashboard Header - Fixed like navbar, edge-to-edge on mobile */
@@ -1444,7 +1449,7 @@
         width: 100% !important;
         z-index: 1001 !important;
         margin: 0 !important;
-        padding: 15.7595px 15px 15.7595px 65px !important;
+        padding: 15.7595px 15px 15.7595px 95px !important;
         border-radius: 0 !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
         background: #1a1a1a !important;
