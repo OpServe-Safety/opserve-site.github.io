@@ -1134,7 +1134,10 @@
     }
     
     /* Increase top padding by 10 for specific elements in tablet view */
-    .dashboard-main > .empty-state {
+    .dashboard-main > .empty-state,
+    .dashboard-main > .dashboard-content > .stats-grid,
+    .dashboard-main > .stats-grid,
+    .dashboard-main > .settings-container {
         padding-top: 120px !important;
     }
 }
