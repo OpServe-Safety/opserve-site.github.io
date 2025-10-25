@@ -902,7 +902,6 @@ header .btn:focus {
         padding-right: 25px;
         gap: 5px;
         transition: var(--transition);
-        box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
     }
 
     .nav-links.active {
