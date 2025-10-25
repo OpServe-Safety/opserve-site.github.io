@@ -894,8 +894,9 @@ header .btn:focus {
         height: 100vh;
         background-color: var(--white);
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
+        padding-top: 80px;
         transition: var(--transition);
         box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
     }
@@ -905,15 +906,17 @@ header .btn:focus {
     }
 
     .nav-links li {
-        margin: 15px 0;
+        margin: 8px 0;
     }
 
     .nav-links a {
-        font-size: 1.2rem;
+        font-size: 1.05rem;
     }
 
     .nav-links .btn {
-        margin: 20px 0 0;
+        margin: 12px 0 0;
+        padding: 10px 24px;
+        font-size: 0.95rem;
     }
 
     .nav-toggle {
