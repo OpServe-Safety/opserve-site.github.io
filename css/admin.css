@@ -1241,15 +1241,21 @@
     }
     
     .btn-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 0.85rem;
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        padding: 0;
+        font-size: 11px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     /* Service Addon Rows - Mobile 2-Row Layout */
     .addon-row {
         display: grid;
-        grid-template-columns: 1fr 36px;
+        grid-template-columns: 1fr 26px;
         grid-template-rows: auto auto;
         gap: 6px;
         padding: 10px;
@@ -1279,17 +1285,19 @@
     .addon-delete-btn {
         grid-column: 2;
         grid-row: 1;
-        width: 36px;
-        height: 36px;
-        padding: 6px;
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        padding: 0;
         background: #dc3545;
         border: none;
-        border-radius: 6px;
+        border-radius: 50%;
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
         align-self: start;
+        font-size: 11px;
     }
     
     .addon-price-input {
@@ -1310,12 +1318,12 @@
     }
     
     .addon-row .add-position-btn {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
         padding: 0;
         margin: 0;
-        font-size: 14px;
+        font-size: 11px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -1328,7 +1336,7 @@
     /* New addon row needs different layout - name on row 1, price/unit/button on row 2 */
     .addon-row-new {
         display: grid !important;
-        grid-template-columns: 70px 1fr 36px !important;
+        grid-template-columns: 70px 1fr 26px !important;
         grid-template-rows: auto auto !important;
         gap: 6px !important;
     }
@@ -1357,6 +1365,10 @@
         grid-column: 3;
         grid-row: 2;
         align-self: center;
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        font-size: 11px;
     }
     
     /* Override inline grid styles for Position Rates and Service Durations on mobile */
@@ -1399,6 +1411,25 @@
     
     .settings-section .section-content div[style*="display: flex"][style*="gap: 10px"] button {
         flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        padding: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+    }
+    
+    /* Ensure payment terms and other buttons are consistent */
+    .settings-section button.add-position-btn {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+        padding: 0 !important;
+        font-size: 11px !important;
+        border-radius: 50% !important;
     }
     
     /* Ensure all settings containers use full width */
