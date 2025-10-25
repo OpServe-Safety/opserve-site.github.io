@@ -1450,7 +1450,7 @@
         width: 100% !important;
         z-index: 1001 !important;
         margin: 0 !important;
-        height: 70.712px !important;
+        height: 60.712px !important;
         padding-left: 70px !important;
         padding-right: 15px !important;
         border-radius: 0 !important;
@@ -1496,9 +1496,9 @@
         width: 100%;
     }
     
-    /* Right-align header text on mobile */
+    /* Left-align header text on mobile */
     .dashboard-header h1 {
-        text-align: right;
+        text-align: left;
         width: 100%;
         flex: 1;
     }
