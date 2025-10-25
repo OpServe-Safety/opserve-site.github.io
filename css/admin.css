@@ -1093,6 +1093,13 @@
 
 /* Mobile auto-hide sidebar */
 @media (max-width: 480px) {
+    /* Force no left spacing on body/html */
+    body, html {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+    
     .dashboard-sidebar {
         position: fixed;
         left: -70px;
@@ -1106,7 +1113,7 @@
     }
     
     .dashboard-main {
-        margin-left: 0;
+        margin: 0;
         padding: 60px 0 0 0;
         width: 100%;
         max-width: 100%;
@@ -1120,6 +1127,13 @@
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    .section-content {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
     
     /* Section cards - full width with rounded corners */
