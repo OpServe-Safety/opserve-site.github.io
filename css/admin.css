@@ -1068,7 +1068,7 @@
     
     .dashboard-main {
         margin-left: 70px;
-        padding: 20px 15px;
+        padding: 90px 15px 20px;
     }
     
     .dashboard-logo h2,
@@ -1233,15 +1233,17 @@
     
     /* Dashboard Header - Edge to edge on tablet */
     .dashboard-header {
+        position: fixed;
+        top: 0;
+        left: 70px;
+        right: 0;
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
-        margin-left: calc(-15px - 70px);
-        margin-right: -15px;
-        margin-bottom: 20px;
         width: calc(100vw - 70px);
-        padding: 20px 15px 20px calc(70px + 15px);
+        padding: 20px 15px;
         box-sizing: border-box;
+        z-index: 100;
     }
     
     .dashboard-user {
@@ -1348,15 +1350,14 @@
         padding: 8px 16px;
     }
     
-    /* Dashboard Header - Sticky on mobile */
+    /* Dashboard Header - Fixed on mobile for true edge-to-edge */
     .dashboard-header {
-        position: -webkit-sticky;
-        position: sticky;
+        position: fixed;
         top: 0;
         left: 0;
         right: 0;
         z-index: 100;
-        margin: 0 -12px 20px -12px;
+        margin: 0;
         padding: 15px 15px 15px 75px;
         border-radius: 0;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -1364,6 +1365,11 @@
         color: white;
         width: 100vw;
         box-sizing: border-box;
+    }
+    
+    /* Add padding to main content for fixed header */
+    .dashboard-main {
+        padding-top: 70px;
     }
     
     .dashboard-header h1 {
