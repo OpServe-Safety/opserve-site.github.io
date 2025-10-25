@@ -951,6 +951,45 @@
     color: #dc3545;
 }
 
+/* Addon Row Styles */
+.addon-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.addon-row-new {
+    margin-top: 15px;
+    margin-bottom: 0;
+}
+
+.addon-input {
+    padding: 8px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.addon-price-input {
+    text-align: center;
+}
+
+.addon-delete-btn {
+    background: #dc3545;
+    color: white;
+    opacity: 0.7;
+    transition: all 0.2s;
+    min-width: 36px;
+}
+
+.addon-delete-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    background: #c82333;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard-sidebar {
@@ -1041,12 +1080,13 @@
     
     /* Service Addon Rows - Tablet Optimization */
     .addon-row {
-        grid-template-columns: 2fr 0.6fr 0.9fr 36px !important;
-        gap: 8px !important;
+        grid-template-columns: 2fr 0.6fr 0.9fr 36px;
+        gap: 8px;
     }
     
-    .addon-row input {
-        font-size: 13px !important;
+    .addon-input {
+        font-size: 13px;
+        padding: 8px 6px;
     }
 }
 
@@ -1121,23 +1161,22 @@
     
     /* Service Addon Rows - Mobile Optimization */
     .addon-row {
-        grid-template-columns: 1.8fr 0.4fr 0.8fr 36px !important;
-        gap: 5px !important;
+        grid-template-columns: 1.5fr 0.35fr 0.95fr 36px;
+        gap: 4px;
     }
     
-    .addon-row input {
-        padding: 6px 3px !important;
-        font-size: 11px !important;
+    .addon-input {
+        padding: 6px 3px;
+        font-size: 11px;
     }
     
-    .addon-row input[type="number"] {
-        width: 100%;
+    .addon-price-input {
         min-width: 45px;
-        text-align: center;
+        padding: 6px 2px;
     }
     
-    .addon-row input[type="text"]:last-of-type {
-        font-size: 10px !important;
-        padding: 6px 2px !important;
+    .addon-unit-input {
+        font-size: 10px;
+        padding: 6px 4px;
     }
 }
