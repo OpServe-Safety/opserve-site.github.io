@@ -2215,9 +2215,6 @@ function initializeKeyringLock() {
     
     console.log('Keyring lock initialized successfully');
     
-    // Make it clear it's clickable
-    keyringTitle.style.transition = 'background-color 0.1s ease';
-    
     // Close the section if it's open
     const sectionContent = keyringSection.querySelector('.section-content');
     const sectionIcon = keyringSection.querySelector('.section-toggle-icon');
@@ -2244,18 +2241,8 @@ function initializeKeyringLock() {
         keyringTapCount++;
         console.log(`Keyring tap count: ${keyringTapCount}/17`); // Debug logging
         
-        // Show visual feedback
-        const progressPercent = (keyringTapCount / 17) * 100;
-        lockIndicator.style.opacity = 0.5 + (progressPercent / 200); // Gradually increase opacity
-        
-        // Add a flash effect for visual feedback
-        keyringTitle.style.backgroundColor = 'rgba(228, 59, 4, 0.1)';
-        setTimeout(() => {
-            keyringTitle.style.backgroundColor = '';
-        }, 100);
-        
-        // Show progress in lock indicator
-        lockIndicator.innerHTML = `<i class="fas fa-lock"></i> ${keyringTapCount}/17`;
+        // No visual feedback - completely secret
+        // Only console logs for debugging
         
         // Clear existing timer
         if (keyringTapTimer) {
@@ -2267,7 +2254,6 @@ function initializeKeyringLock() {
             console.log('Unlock threshold reached! Showing warning modal...');
             showKeyringUnlockWarning(keyringSection);
             keyringTapCount = 0;
-            lockIndicator.innerHTML = '<i class="fas fa-lock"></i>';
             return;
         }
         
@@ -2275,8 +2261,6 @@ function initializeKeyringLock() {
         keyringTapTimer = setTimeout(() => {
             console.log('Tap timer expired - resetting count');
             keyringTapCount = 0;
-            lockIndicator.style.opacity = 0.5;
-            lockIndicator.innerHTML = '<i class="fas fa-lock"></i>';
         }, 5000);
     });
 }
@@ -2467,53 +2451,13 @@ function applyKeyringLockState(keyringSection, locked) {
     if (!sectionContent) return;
     
     if (locked) {
-        // Create overlay if it doesn't exist
-        let overlay = keyringSection.querySelector('.keyring-lock-overlay');
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.className = 'keyring-lock-overlay';
-            overlay.style.cssText = `
-                position: absolute;
-                top: 60px;
-                left: 0;
-                width: 100%;
-                height: calc(100% - 60px);
-                background: rgba(255, 255, 255, 0.85);
-                backdrop-filter: blur(3px);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 100;
-                cursor: help;
-                pointer-events: none;
-            `;
-            
-            overlay.innerHTML = `
-                <div style="text-align: center; color: #666;">
-                    <i class="fas fa-lock" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
-                    <p style="margin: 0; font-weight: 600;">Section Locked</p>
-                </div>
-            `;
-            
-            // Make section position relative
-            keyringSection.style.position = 'relative';
-            keyringSection.appendChild(overlay);
-        }
-        
-        overlay.style.display = 'flex';
-        
+        // No visible overlay - section looks normal but is locked
         // Disable all inputs, selects, and buttons
         const inputs = sectionContent.querySelectorAll('input, select, textarea, button');
         inputs.forEach(input => {
             input.disabled = true;
         });
     } else {
-        // Remove overlay
-        const overlay = keyringSection.querySelector('.keyring-lock-overlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
-        
         // Enable all inputs, selects, and buttons (except read-only ones)
         const inputs = sectionContent.querySelectorAll('input:not([readonly]), select, textarea, button');
         inputs.forEach(input => {
