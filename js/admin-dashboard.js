@@ -2205,7 +2205,15 @@ function initializeKeyringLock() {
     const keyringTitle = document.getElementById('keyringTitle');
     const lockIndicator = document.getElementById('lockIndicator');
     
-    if (!keyringSection || !keyringTitle) return;
+    if (!keyringSection || !keyringTitle) {
+        console.error('Keyring lock initialization failed - elements not found');
+        return;
+    }
+    
+    console.log('Keyring lock initialized successfully');
+    
+    // Make it clear it's clickable
+    keyringTitle.style.transition = 'background-color 0.1s ease';
     
     // Close the section if it's open
     const sectionContent = keyringSection.querySelector('.section-content');
@@ -2231,10 +2239,20 @@ function initializeKeyringLock() {
         
         // Increment tap count
         keyringTapCount++;
+        console.log(`Keyring tap count: ${keyringTapCount}/17`); // Debug logging
         
         // Show visual feedback
         const progressPercent = (keyringTapCount / 17) * 100;
         lockIndicator.style.opacity = 0.5 + (progressPercent / 200); // Gradually increase opacity
+        
+        // Add a flash effect for visual feedback
+        keyringTitle.style.backgroundColor = 'rgba(228, 59, 4, 0.1)';
+        setTimeout(() => {
+            keyringTitle.style.backgroundColor = '';
+        }, 100);
+        
+        // Show progress in lock indicator
+        lockIndicator.innerHTML = `<i class="fas fa-lock"></i> ${keyringTapCount}/17`;
         
         // Clear existing timer
         if (keyringTapTimer) {
@@ -2243,15 +2261,19 @@ function initializeKeyringLock() {
         
         // Check if unlocked
         if (keyringTapCount >= 17) {
+            console.log('Unlock threshold reached! Showing warning modal...');
             showKeyringUnlockWarning(keyringSection);
             keyringTapCount = 0;
+            lockIndicator.innerHTML = '<i class="fas fa-lock"></i>';
             return;
         }
         
         // Reset after 5 seconds of no taps
         keyringTapTimer = setTimeout(() => {
+            console.log('Tap timer expired - resetting count');
             keyringTapCount = 0;
             lockIndicator.style.opacity = 0.5;
+            lockIndicator.innerHTML = '<i class="fas fa-lock"></i>';
         }, 5000);
     });
 }
