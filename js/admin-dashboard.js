@@ -1771,8 +1771,13 @@ async function renderSettingsView() {
             </div>
             
             <!-- Integration Keyring Section -->
-            <div class="settings-section">
-                <h2><i class="fas fa-key"></i> Integration Keyring</h2>
+            <div class="settings-section" id="integrationKeyring">
+                <h2 id="keyringTitle" style="cursor: pointer; user-select: none;">
+                    <i class="fas fa-key"></i> Integration Keyring
+                    <span id="lockIndicator" style="margin-left: 10px; opacity: 0.5;">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                </h2>
                 <div class="section-content">
                     <p style="color: #6c757d; margin-bottom: 25px;">Connect third-party services and configure integrations.</p>
                 
@@ -2180,6 +2185,323 @@ function initializeCollapsibleSections() {
             });
         }
     });
+}
+
+// Integration Keyring Lock System
+let keyringTapCount = 0;
+let keyringTapTimer = null;
+let keyringUnlocked = false;
+let keyringAutoLockTimer = null;
+
+function initializeKeyringLock() {
+    const keyringSection = document.getElementById('integrationKeyring');
+    const keyringTitle = document.getElementById('keyringTitle');
+    const lockIndicator = document.getElementById('lockIndicator');
+    
+    if (!keyringSection || !keyringTitle) return;
+    
+    // Apply initial lock state
+    applyKeyringLockState(keyringSection, true);
+    
+    // Add tap detection to title
+    keyringTitle.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent collapsible section toggle
+        
+        if (keyringUnlocked) {
+            // Already unlocked, do nothing
+            return;
+        }
+        
+        // Increment tap count
+        keyringTapCount++;
+        
+        // Show visual feedback
+        const progressPercent = (keyringTapCount / 17) * 100;
+        lockIndicator.style.opacity = 0.5 + (progressPercent / 200); // Gradually increase opacity
+        
+        // Clear existing timer
+        if (keyringTapTimer) {
+            clearTimeout(keyringTapTimer);
+        }
+        
+        // Check if unlocked
+        if (keyringTapCount >= 17) {
+            showKeyringUnlockWarning(keyringSection);
+            keyringTapCount = 0;
+            return;
+        }
+        
+        // Reset after 3 seconds of no taps
+        keyringTapTimer = setTimeout(() => {
+            keyringTapCount = 0;
+            lockIndicator.style.opacity = 0.5;
+        }, 3000);
+    });
+}
+
+function showKeyringUnlockWarning(keyringSection) {
+    // Create warning modal
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        animation: fadeIn 0.2s ease;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+    `;
+    
+    modalContent.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 15px;"></i>
+            <h2 style="margin: 0 0 10px 0; color: #333;">⚠️ Critical Settings Warning</h2>
+        </div>
+        
+        <div style="background: #fff3cd; border-left: 4px solid #ff9800; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+            <p style="margin: 0 0 10px 0; font-weight: 600; color: #856404;">
+                <i class="fas fa-info-circle"></i> You are about to unlock the Integration Keyring
+            </p>
+            <p style="margin: 0; font-size: 0.95rem; color: #856404;">
+                Changes to these settings can <strong>severely impact web application performance</strong> and functionality.
+            </p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <p style="margin: 0 0 10px 0; font-weight: 600; color: #333;">Critical Areas:</p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: #555;">
+                <li>Database connections (Supabase)</li>
+                <li>Email service integrations</li>
+                <li>Payroll system connections</li>
+                <li>Analytics tracking</li>
+            </ul>
+        </div>
+        
+        <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 25px;">
+            <i class="fas fa-lock-open"></i> This section will auto-lock after <strong>2 minutes</strong> of inactivity.
+        </p>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="keyringCancel" class="btn btn-secondary" style="flex: 1; max-width: 150px;">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button id="keyringConfirm" class="btn btn-primary" style="flex: 1; max-width: 150px; background: #ff9800; border-color: #ff9800;">
+                <i class="fas fa-unlock"></i> Unlock
+            </button>
+        </div>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Handle buttons
+    document.getElementById('keyringCancel').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    document.getElementById('keyringConfirm').addEventListener('click', () => {
+        unlockKeyringSection(keyringSection);
+        document.body.removeChild(modal);
+    });
+}
+
+function unlockKeyringSection(keyringSection) {
+    keyringUnlocked = true;
+    applyKeyringLockState(keyringSection, false);
+    
+    // Update lock indicator
+    const lockIndicator = document.getElementById('lockIndicator');
+    lockIndicator.innerHTML = '<i class="fas fa-unlock"></i>';
+    lockIndicator.style.opacity = 1;
+    lockIndicator.style.color = '#4caf50';
+    
+    // Set auto-lock timer (2 minutes)
+    if (keyringAutoLockTimer) {
+        clearTimeout(keyringAutoLockTimer);
+    }
+    
+    keyringAutoLockTimer = setTimeout(() => {
+        lockKeyringSection(keyringSection);
+        showNotification('Integration Keyring auto-locked after inactivity', 'info');
+    }, 120000); // 2 minutes
+    
+    // Reset timer on any interaction within the section
+    keyringSection.addEventListener('click', resetKeyringAutoLock);
+    keyringSection.addEventListener('input', resetKeyringAutoLock);
+    keyringSection.addEventListener('change', resetKeyringAutoLock);
+    
+    showNotification('Integration Keyring unlocked. Auto-locks in 2 minutes.', 'success');
+}
+
+function lockKeyringSection(keyringSection) {
+    keyringUnlocked = false;
+    applyKeyringLockState(keyringSection, true);
+    
+    // Update lock indicator
+    const lockIndicator = document.getElementById('lockIndicator');
+    lockIndicator.innerHTML = '<i class="fas fa-lock"></i>';
+    lockIndicator.style.opacity = 0.5;
+    lockIndicator.style.color = '';
+    
+    // Clear auto-lock timer
+    if (keyringAutoLockTimer) {
+        clearTimeout(keyringAutoLockTimer);
+    }
+    
+    // Remove event listeners
+    keyringSection.removeEventListener('click', resetKeyringAutoLock);
+    keyringSection.removeEventListener('input', resetKeyringAutoLock);
+    keyringSection.removeEventListener('change', resetKeyringAutoLock);
+}
+
+function resetKeyringAutoLock() {
+    if (!keyringUnlocked) return;
+    
+    const keyringSection = document.getElementById('integrationKeyring');
+    if (!keyringSection) return;
+    
+    // Clear and restart timer
+    if (keyringAutoLockTimer) {
+        clearTimeout(keyringAutoLockTimer);
+    }
+    
+    keyringAutoLockTimer = setTimeout(() => {
+        lockKeyringSection(keyringSection);
+        showNotification('Integration Keyring auto-locked after inactivity', 'info');
+    }, 120000); // 2 minutes
+}
+
+function applyKeyringLockState(keyringSection, locked) {
+    const sectionContent = keyringSection.querySelector('.section-content');
+    if (!sectionContent) return;
+    
+    if (locked) {
+        // Create overlay if it doesn't exist
+        let overlay = keyringSection.querySelector('.keyring-lock-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'keyring-lock-overlay';
+            overlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(3px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 100;
+                cursor: help;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="text-align: center; color: #666;">
+                    <i class="fas fa-lock" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                    <p style="margin: 0; font-weight: 600;">Section Locked</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.7;">Tap title 17 times to unlock</p>
+                </div>
+            `;
+            
+            // Make section position relative
+            keyringSection.style.position = 'relative';
+            keyringSection.appendChild(overlay);
+        }
+        
+        overlay.style.display = 'flex';
+        
+        // Disable all inputs, selects, and buttons
+        const inputs = sectionContent.querySelectorAll('input, select, textarea, button');
+        inputs.forEach(input => {
+            input.disabled = true;
+        });
+    } else {
+        // Remove overlay
+        const overlay = keyringSection.querySelector('.keyring-lock-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+        
+        // Enable all inputs, selects, and buttons (except read-only ones)
+        const inputs = sectionContent.querySelectorAll('input:not([readonly]), select, textarea, button');
+        inputs.forEach(input => {
+            input.disabled = false;
+        });
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4caf50' : type === 'info' ? '#2196F3' : '#ff9800'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 10001;
+        animation: slideIn 0.3s ease;
+        max-width: 350px;
+    `;
+    
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'info' ? 'info-circle' : 'exclamation-circle'}"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Add animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
 }
 
 // Render contacts view
