@@ -1391,10 +1391,12 @@
         border-radius: 12px;
     }
     
-    /* Settings container - no padding, just top margin */
+    /* Settings container - full width on mobile */
     .settings-container {
-        margin-top: 20px;
+        margin: 20px 0 0 0;
         padding: 0;
+        max-width: 100%;
+        width: 100%;
     }
     
     /* Action Buttons */
