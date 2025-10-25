@@ -1121,6 +1121,11 @@
         left: 0;
     }
     
+    /* Reduce logo size by 40% on mobile */
+    .dashboard-logo img {
+        width: 48px;
+    }
+    
     .dashboard-main {
         margin: 0 !important;
         padding: 60px 0 0 0 !important;
@@ -1273,7 +1278,7 @@
         align-items: flex-start !important;
         gap: 15px !important;
         margin: 0 !important;
-        padding: 20px !important;
+        padding: 25.7315px 20px !important;
         box-sizing: border-box !important;
         z-index: 1000 !important;
         background: #1a1a1a !important;
@@ -1717,5 +1722,17 @@
         overflow-x: hidden;
         padding: 0;
         margin: 0;
+    }
+}
+
+/* Desktop view - Remove headers since full nav text is visible */
+@media (min-width: 769px) {
+    .dashboard-header {
+        display: none !important;
+    }
+    
+    /* Adjust main content to not have top padding for header */
+    .dashboard-main {
+        padding-top: 0 !important;
     }
 }
