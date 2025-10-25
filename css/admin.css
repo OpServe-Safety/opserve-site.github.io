@@ -291,7 +291,9 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 0;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 .stat-card {

@@ -880,7 +880,7 @@ function renderApplicationsView() {
             </div>
         </div>
         
-        <!-- Stats -->
+        <!-- Stats and Content Container -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Applications</h3>
@@ -902,10 +902,9 @@ function renderApplicationsView() {
                 <div class="stat-number" id="statApproved">0</div>
                 <div class="stat-label">Ready to onboard</div>
             </div>
-        </div>
-        
-        <!-- Filters -->
-        <div class="filters-bar">
+            
+            <!-- Filters -->
+            <div class="filters-bar" style="grid-column: 1 / -1;">
             <!-- Desktop Filter Buttons -->
             <div class="filter-group">
                 <button class="filter-btn active" data-status="all">All</button>
@@ -928,6 +927,34 @@ function renderApplicationsView() {
                 <span>Filters</span>
                 <span class="badge" id="appFilterBadge">All</span>
             </button>
+        </div>
+            
+            <!-- Applications Table -->
+            <div class="applications-container" style="grid-column: 1 / -1;">
+            <div class="table-responsive">
+                <table class="applications-table">
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Position</th>
+                            <th>Applied</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationsTableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <h3>No applications found</h3>
+                <p>Applications will appear here when submitted.</p>
+            </div>
+        </div>
         </div>
         
         <!-- Filter Modal -->
@@ -965,33 +992,6 @@ function renderApplicationsView() {
                         <label>Onboarded</label>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Applications Table -->
-        <div class="applications-container">
-            <div class="table-responsive">
-                <table class="applications-table">
-                    <thead>
-                        <tr>
-                            <th>Applicant</th>
-                            <th>Position</th>
-                            <th>Applied</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="applicationsTableBody">
-                        <!-- Will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Empty State -->
-            <div class="empty-state" id="emptyState" style="display: none;">
-                <i class="fas fa-inbox"></i>
-                <h3>No applications found</h3>
-                <p>Applications will appear here when submitted.</p>
             </div>
         </div>
     `;
@@ -2220,7 +2220,7 @@ async function renderContactsView() {
             </div>
         </div>
         
-        <!-- Stats -->
+        <!-- Stats and Content Container -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Inquiries</h3>
@@ -2242,10 +2242,9 @@ async function renderContactsView() {
                 <div class="stat-number" id="statConvertedContacts">${stats.converted}</div>
                 <div class="stat-label">Became clients</div>
             </div>
-        </div>
-        
-        <!-- Filters -->
-        <div class="filters-bar">
+            
+            <!-- Filters -->
+            <div class="filters-bar" style="grid-column: 1 / -1;">
             <!-- Desktop Filter Buttons -->
             <div class="filter-group">
                 <button class="filter-btn active" data-status="all">All</button>
@@ -2268,6 +2267,35 @@ async function renderContactsView() {
                 <span>Filters</span>
                 <span class="badge" id="contactFilterBadge">All</span>
             </button>
+        </div>
+            
+            <!-- Contacts Table -->
+            <div class="applications-container" style="grid-column: 1 / -1;">
+            <div class="table-responsive">
+                <table class="applications-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Service</th>
+                            <th>Contact Info</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contactsTableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyContactsState" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <h3>No contact submissions found</h3>
+                <p>Contact form submissions will appear here.</p>
+            </div>
+        </div>
         </div>
         
         <!-- Filter Modal -->
@@ -2305,34 +2333,6 @@ async function renderContactsView() {
                         <label>Not Interested</label>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Contacts Table -->
-        <div class="applications-container">
-            <div class="table-responsive">
-                <table class="applications-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Service</th>
-                            <th>Contact Info</th>
-                            <th>Submitted</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="contactsTableBody">
-                        <!-- Will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Empty State -->
-            <div class="empty-state" id="emptyContactsState" style="display: none;">
-                <i class="fas fa-inbox"></i>
-                <h3>No contact submissions found</h3>
-                <p>Contact form submissions will appear here.</p>
             </div>
         </div>
         
@@ -2471,7 +2471,7 @@ async function renderQuotesView() {
             </div>
         </div>
         
-        <!-- Stats -->
+        <!-- Stats and Content Container -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Quotes</h3>
@@ -2493,10 +2493,9 @@ async function renderQuotesView() {
                 <div class="stat-number" id="statAcceptedQuotes">${stats.accepted}</div>
                 <div class="stat-label">$${stats.revenue.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
             </div>
-        </div>
-        
-        <!-- Filters -->
-        <div class="filters-bar">
+            
+            <!-- Filters -->
+            <div class="filters-bar" style="grid-column: 1 / -1;">
             <!-- Desktop Filter Buttons -->
             <div class="filter-group">
                 <button class="filter-btn active" data-status="all">All</button>
@@ -2518,6 +2517,36 @@ async function renderQuotesView() {
                 <span>Filters</span>
                 <span class="badge" id="quoteFilterBadge">All</span>
             </button>
+        </div>
+            
+            <!-- Quotes Table -->
+            <div class="applications-container" style="grid-column: 1 / -1;">
+            <div class="table-responsive">
+                <table class="applications-table">
+                    <thead>
+                        <tr>
+                            <th>Quote #</th>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Amount</th>
+                            <th>Event Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quotesTableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyQuotesState" style="display: none;">
+                <i class="fas fa-file-invoice"></i>
+                <h3>No quotes found</h3>
+                <p>Quotes will appear here when created.</p>
+            </div>
+        </div>
         </div>
         
         <!-- Filter Modal -->
@@ -2551,35 +2580,6 @@ async function renderQuotesView() {
                         <label>Declined</label>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Quotes Table -->
-        <div class="applications-container">
-            <div class="table-responsive">
-                <table class="applications-table">
-                    <thead>
-                        <tr>
-                            <th>Quote #</th>
-                            <th>Client</th>
-                            <th>Service</th>
-                            <th>Amount</th>
-                            <th>Event Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="quotesTableBody">
-                        <!-- Will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Empty State -->
-            <div class="empty-state" id="emptyQuotesState" style="display: none;">
-                <i class="fas fa-file-invoice"></i>
-                <h3>No quotes found</h3>
-                <p>Quotes will appear here when created.</p>
             </div>
         </div>
         
