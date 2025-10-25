@@ -1132,6 +1132,13 @@
     .stats-grid {
         margin-top: 0 !important;
     }
+    
+    /* Increase top padding by 10 for specific elements in tablet view */
+    .stats-grid,
+    .empty-state,
+    .settings-container {
+        padding-top: 120px !important;
+    }
 }
 
 /* Mobile auto-hide sidebar */
