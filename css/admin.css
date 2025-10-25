@@ -1098,6 +1098,31 @@
     .dashboard-logout a span {
         display: none;
     }
+    
+    /* Dashboard Header - Fixed edge to edge on tablet */
+    .dashboard-container .dashboard-main .dashboard-header,
+    .dashboard-main .dashboard-header,
+    .dashboard-header {
+        position: fixed !important;
+        top: 0 !important;
+        left: 70px !important;
+        width: calc(100% - 70px) !important;
+        z-index: 1000 !important;
+        margin: 0 !important;
+        padding-top: 25.7315px !important;
+        padding-bottom: 25.7315px !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        border-radius: 0 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        background: #1a1a1a !important;
+        color: white !important;
+        box-sizing: border-box !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 15px !important;
+        display: flex !important;
+    }
 }
 
 /* Mobile auto-hide sidebar */
@@ -1264,31 +1289,6 @@
     
     table {
         min-width: 600px;
-    }
-    
-    /* Dashboard Header - Fixed edge to edge on tablet (same approach as mobile) */
-    .dashboard-container .dashboard-main .dashboard-header,
-    .dashboard-main .dashboard-header,
-    .dashboard-header {
-        position: fixed !important;
-        top: 0 !important;
-        left: 70px !important;
-        width: calc(100% - 70px) !important;
-        z-index: 1000 !important;
-        margin: 0 !important;
-        padding-top: 25.7315px !important;
-        padding-bottom: 25.7315px !important;
-        padding-left: 20px !important;
-        padding-right: 20px !important;
-        border-radius: 0 !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-        background: #1a1a1a !important;
-        color: white !important;
-        box-sizing: border-box !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 15px !important;
-        display: flex !important;
     }
     
     .dashboard-user {
