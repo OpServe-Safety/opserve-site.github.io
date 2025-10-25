@@ -1124,9 +1124,13 @@
         display: flex !important;
     }
     
-    /* Add top margin to stats-grid to prevent header overlap */
+    /* Add top padding to ALL content to prevent header overlap */
+    .dashboard-main > *:not(.dashboard-header) {
+        padding-top: 110px !important;
+    }
+    
     .stats-grid {
-        margin-top: 110px !important;
+        margin-top: 0 !important;
     }
 }
 
@@ -1418,8 +1422,8 @@
         padding: 8px 16px;
     }
     
-    /* Show logo in mobile header */
-    .dashboard-header::before {
+    /* Show logo in mobile header ONLY */
+    .dashboard-main .dashboard-header::before {
         content: '';
         display: block;
         width: 38.4px;
@@ -1430,6 +1434,12 @@
         left: 55px;
         top: 50%;
         transform: translateY(-50%);
+        z-index: 1;
+    }
+    
+    /* Hide sidebar logo on mobile */
+    .dashboard-sidebar .dashboard-logo {
+        display: none !important;
     }
     
     /* Dashboard Header - Fixed like navbar, edge-to-edge on mobile */
