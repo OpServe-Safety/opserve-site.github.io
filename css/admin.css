@@ -1150,6 +1150,16 @@
         padding-bottom: 20px !important;
         padding-left: 20px !important;
     }
+    
+    /* Mobile Filter Button - Show on tablet */
+    .mobile-filter-btn {
+        display: flex !important;
+    }
+    
+    /* Hide desktop filter buttons on tablet */
+    .filter-group {
+        display: none !important;
+    }
 }
 
 /* Mobile auto-hide sidebar */
@@ -1316,14 +1326,14 @@
         display: none;
     }
     
-    /* Mobile Filter Button - Show on tablet and below */
+    /* Mobile Filter Button - Show on tablet */
     .mobile-filter-btn {
-        display: flex;
+        display: flex !important;
     }
     
-    /* Hide desktop filter buttons on mobile */
+    /* Hide desktop filter buttons on tablet */
     .filter-group {
-        display: none;
+        display: none !important;
     }
     
     /* Adjust filters bar layout for mobile */
