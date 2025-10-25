@@ -1242,10 +1242,11 @@
         width: 100%;
     }
     
-    /* Stats Grid */
+    /* Stats Grid - Tablet */
     .stats-grid {
         grid-template-columns: 1fr 1fr;
         gap: 15px;
+        padding: 20px !important;
     }
     
     /* Tables */
@@ -1325,14 +1326,27 @@
         padding: 15px 8px;
     }
     
-    /* Stats Grid - Single Column */
+    /* Stats Grid - Mobile 2 columns */
     .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 10px !important;
     }
     
     .stat-card {
-        padding: 20px;
+        padding: 12px;
+    }
+    
+    .stat-card h3 {
+        font-size: 0.7rem;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.75rem;
     }
     
     .stat-value {
