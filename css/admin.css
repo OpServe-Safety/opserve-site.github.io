@@ -1019,6 +1019,70 @@
     .dashboard-logout a span {
         display: none;
     }
+}
+
+/* Mobile auto-hide sidebar */
+@media (max-width: 480px) {
+    .dashboard-sidebar {
+        position: fixed;
+        left: -70px;
+        width: 70px;
+        transition: left 0.3s ease;
+        z-index: 1000;
+    }
+    
+    .dashboard-sidebar.active {
+        left: 0;
+    }
+    
+    .dashboard-main {
+        margin-left: 0;
+        padding: 15px 8px;
+    }
+    
+    /* Mobile menu toggle button */
+    .mobile-nav-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        width: 44px;
+        height: 44px;
+        background: #e43b04;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 999;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-nav-toggle:active {
+        transform: scale(0.95);
+    }
+    
+    .mobile-nav-toggle i {
+        font-size: 1.2rem;
+    }
+    
+    /* Overlay when sidebar is open */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
     
     .filters-bar {
         flex-direction: column;

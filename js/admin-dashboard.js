@@ -59,6 +59,9 @@ function setupEventListeners() {
         logout();
     });
     
+    // Mobile nav toggle
+    setupMobileNavToggle();
+    
     // Filter buttons (only if they exist)
     const filterBtns = document.querySelectorAll('.filter-btn');
     filterBtns.forEach(btn => {
@@ -94,6 +97,59 @@ function setupEventListeners() {
                 modal.style.display = 'none';
                 modal.classList.remove('active');
             }
+        });
+    }
+}
+
+// Setup mobile navigation toggle
+function setupMobileNavToggle() {
+    // Create toggle button if it doesn't exist
+    if (!document.querySelector('.mobile-nav-toggle')) {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'mobile-nav-toggle';
+        toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        toggleBtn.setAttribute('aria-label', 'Toggle navigation');
+        document.body.appendChild(toggleBtn);
+        
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+        
+        // Toggle sidebar
+        toggleBtn.addEventListener('click', () => {
+            const sidebar = document.querySelector('.dashboard-sidebar');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Change icon
+            const icon = toggleBtn.querySelector('i');
+            if (sidebar.classList.contains('active')) {
+                icon.className = 'fas fa-times';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        });
+        
+        // Close sidebar when clicking overlay
+        overlay.addEventListener('click', () => {
+            const sidebar = document.querySelector('.dashboard-sidebar');
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            toggleBtn.querySelector('i').className = 'fas fa-bars';
+        });
+        
+        // Close sidebar when clicking a nav link on mobile
+        const navLinks = document.querySelectorAll('.dashboard-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 480) {
+                    const sidebar = document.querySelector('.dashboard-sidebar');
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                    toggleBtn.querySelector('i').className = 'fas fa-bars';
+                }
+            });
         });
     }
 }
