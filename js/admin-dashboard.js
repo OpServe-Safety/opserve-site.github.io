@@ -1830,7 +1830,7 @@ async function renderSettingsView() {
                         <i class="fas fa-plug"></i> Test Connection
                     </button>
                     <button class="btn btn-secondary" onclick="window.open('https://supabase.com/dashboard/project/' + (window.SUPABASE_URL || '').split('//')[1]?.split('.')[0], '_blank')" style="background: #555; border-color: #555;">
-                        <i class="fas fa-external-link-alt"></i> Open Supabase Dashboard
+                        <i class="fas fa-external-link-alt"></i> Open Supabase
                     </button>
                 </div>
                 

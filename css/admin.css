@@ -250,33 +250,36 @@
 .dashboard-main {
     margin-left: 260px;
     flex: 1;
-    padding: 30px;
+    padding: 0;
     max-width: 100%;
     overflow-x: hidden;
 }
 
 .dashboard-header {
-    background: white;
-    padding: 25px 30px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-bottom: 30px;
+    background: #1a1a1a;
+    color: white;
+    padding: 20px 30px;
+    border-radius: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    margin: 0;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    width: 100%;
+}
+
+/* Content after header needs padding */
+.dashboard-main > *:not(.dashboard-header) {
+    padding: 30px;
 }
 
 .dashboard-header h1 {
     font-size: 1.8rem;
-    color: #1a1a1a;
+    color: white;
     margin: 0;
 }
 
 .dashboard-user {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #6c757d;
+    display: none;
 }
 
 .dashboard-user i {
@@ -1236,7 +1239,7 @@
     }
     
     .dashboard-user {
-        font-size: 0.85rem;
+        display: none;
     }
     
     /* Mobile Filter Button - Show on tablet and below */
@@ -1348,10 +1351,11 @@
         right: 0;
         z-index: 100;
         margin: 0;
-        padding: 15px 12px 15px 12px;
+        padding: 15px 12px 15px 75px;
         border-radius: 0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        background: #1a1a1a;
+        color: white;
         width: 100%;
         box-sizing: border-box;
     }
@@ -1361,12 +1365,11 @@
         line-height: 1.3;
         margin: 0;
         padding-left: 0;
+        color: white;
     }
     
-    .dashboard-header .admin-email {
-        font-size: 0.8rem;
-        margin-top: 4px;
-        padding-left: 0;
+    .dashboard-user {
+        display: none;
     }
     
     /* Content area padding below sticky header */
