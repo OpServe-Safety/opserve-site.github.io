@@ -1121,9 +1121,9 @@
         left: 0;
     }
     
-    /* Reduce logo size by 40% on mobile */
+    /* Reduce logo size by 40% + additional 20% on mobile */
     .dashboard-logo img {
-        width: 48px;
+        width: 38.4px;
     }
     
     .dashboard-main {
