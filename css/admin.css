@@ -1245,11 +1245,28 @@
         height: 26px;
         min-width: 26px;
         padding: 0;
-        font-size: 11px;
-        border-radius: 50%;
+        font-size: 16px;
+        background: transparent;
+        border: none;
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-icon:hover {
+        transform: scale(1.15);
+    }
+    
+    .btn-icon:active {
+        transform: scale(0.95);
+    }
+    
+    /* Red delete icon buttons */
+    .btn-icon[style*="color: #dc3545"]:hover,
+    .btn-icon[onclick*="remove"]:hover {
+        color: #c82333 !important;
     }
     
     /* Service Addon Rows - Mobile 2-Row Layout */
@@ -1289,15 +1306,25 @@
         height: 26px;
         min-width: 26px;
         padding: 0;
-        background: #dc3545;
+        background: transparent;
         border: none;
-        border-radius: 50%;
-        color: white;
+        color: #dc3545;
         display: flex;
         align-items: center;
         justify-content: center;
         align-self: start;
-        font-size: 11px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .addon-delete-btn:hover {
+        color: #c82333;
+        transform: scale(1.15);
+    }
+    
+    .addon-delete-btn:active {
+        transform: scale(0.95);
     }
     
     .addon-price-input {

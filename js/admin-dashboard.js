@@ -1754,10 +1754,7 @@ async function renderSettingsView() {
                     ${settings.quoteSettings.paymentTerms.map((term, index) => `
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                             <span style="flex: 1; padding: 10px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">${term}</span>
-                            <button onclick="removePaymentTerm(${index})" class="btn btn-icon" style="background: #dc3545; color: white; opacity: 0.7; transition: all 0.2s;" 
-                                    onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.background='#c82333';" 
-                                    onmouseout="this.style.opacity='0.7'; this.style.transform='scale(1)'; this.style.background='#dc3545';" 
-                                    title="Remove">
+                            <button onclick="removePaymentTerm(${index})" class="btn btn-icon" style="color: #dc3545;" title="Remove">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
