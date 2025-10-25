@@ -1287,10 +1287,11 @@
     }
     
     .filters-bar {
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 10px !important;
         padding: 20px !important;
+        flex-wrap: nowrap !important;
     }
     
     .applications-container {
@@ -1298,7 +1299,7 @@
     }
     
     .search-box {
-        flex: 1;
+        flex: 1 !important;
     }
     
     /* Tables */
