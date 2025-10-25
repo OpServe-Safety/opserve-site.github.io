@@ -1267,6 +1267,7 @@
     }
     
     /* Dashboard Header - Fixed edge to edge on tablet (same approach as mobile) */
+    .dashboard-main .dashboard-header,
     .dashboard-header {
         position: fixed !important;
         top: 0 !important;
@@ -1274,12 +1275,15 @@
         width: calc(100% - 70px) !important;
         z-index: 1000 !important;
         margin: 0 !important;
-        padding: 25.7315px 20px !important;
+        padding-top: 25.7315px !important;
+        padding-bottom: 25.7315px !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
         border-radius: 0 !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
         background: #1a1a1a !important;
         color: white !important;
-        box-sizing: border-box;
+        box-sizing: border-box !important;
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 15px !important;
