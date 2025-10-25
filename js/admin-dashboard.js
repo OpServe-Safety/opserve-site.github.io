@@ -2474,10 +2474,10 @@ function applyKeyringLockState(keyringSection, locked) {
             overlay.className = 'keyring-lock-overlay';
             overlay.style.cssText = `
                 position: absolute;
-                top: 0;
+                top: 60px;
                 left: 0;
                 width: 100%;
-                height: 100%;
+                height: calc(100% - 60px);
                 background: rgba(255, 255, 255, 0.85);
                 backdrop-filter: blur(3px);
                 display: flex;
@@ -2485,13 +2485,13 @@ function applyKeyringLockState(keyringSection, locked) {
                 justify-content: center;
                 z-index: 100;
                 cursor: help;
+                pointer-events: none;
             `;
             
             overlay.innerHTML = `
                 <div style="text-align: center; color: #666;">
                     <i class="fas fa-lock" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
                     <p style="margin: 0; font-weight: 600;">Section Locked</p>
-                    <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.7;">Tap title 17+ times in 5 seconds</p>
                 </div>
             `;
             
