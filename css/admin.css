@@ -1365,11 +1365,14 @@
     }
     
     /* Stats Grid - Mobile 2 columns */
-    .stats-grid {
+    .dashboard-main > .stats-grid,
+    .dashboard-main > .dashboard-content > .stats-grid {
         grid-template-columns: 1fr 1fr;
         gap: 10px;
-        padding: 10px !important;
         padding-top: 10px !important;
+        padding-right: 10px !important;
+        padding-bottom: 10px !important;
+        padding-left: 10px !important;
     }
     
     .stat-card {
@@ -1500,10 +1503,12 @@
     }
     
     /* Settings container - mobile padding */
-    .settings-container {
+    .dashboard-main > .settings-container {
         margin: 0 !important;
-        padding: 10px 10px 0 10px !important;
         padding-top: 10px !important;
+        padding-right: 10px !important;
+        padding-bottom: 10px !important;
+        padding-left: 10px !important;
         max-width: 100%;
         width: 100%;
     }
