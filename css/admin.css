@@ -1071,6 +1071,7 @@
     .dashboard-main {
         margin-left: 70px;
         padding: 0;
+        padding-top: 90px;
     }
     
     /* Settings container - tablet padding */
@@ -1261,22 +1262,19 @@
     
     /* Dashboard Header - Fixed edge to edge on tablet */
     .dashboard-header {
-        position: fixed;
-        top: 0;
-        left: 70px;
-        width: calc(100vw - 70px);
+        position: fixed !important;
+        top: 0 !important;
+        left: 70px !important;
+        width: calc(100vw - 70px) !important;
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
-        margin: 0;
+        margin: 0 !important;
         padding: 20px;
         box-sizing: border-box;
-        z-index: 100;
-    }
-    
-    /* Add top padding to main content for fixed header on tablet */
-    .dashboard-main {
-        padding-top: 100px !important;
+        z-index: 1000 !important;
+        background: #1a1a1a;
+        color: white;
     }
     
     .dashboard-user {
