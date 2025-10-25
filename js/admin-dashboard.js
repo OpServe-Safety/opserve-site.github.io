@@ -2162,6 +2162,13 @@ function initializeCollapsibleSections() {
             
             // Toggle on click (accordion behavior)
             header.addEventListener('click', function(e) {
+                // Check if this is the Integration Keyring section and it's locked
+                if (section.id === 'integrationKeyring' && !keyringUnlocked) {
+                    // Don't allow opening when locked
+                    e.preventDefault();
+                    return;
+                }
+                
                 // Only toggle if clicking the header itself, not elements inside content
                 const isCurrentlyCollapsed = content.style.display === 'none';
                 
@@ -2199,6 +2206,16 @@ function initializeKeyringLock() {
     const lockIndicator = document.getElementById('lockIndicator');
     
     if (!keyringSection || !keyringTitle) return;
+    
+    // Close the section if it's open
+    const sectionContent = keyringSection.querySelector('.section-content');
+    const sectionIcon = keyringSection.querySelector('.section-toggle-icon');
+    if (sectionContent) {
+        sectionContent.style.display = 'none';
+    }
+    if (sectionIcon) {
+        sectionIcon.style.transform = 'rotate(0deg)';
+    }
     
     // Apply initial lock state
     applyKeyringLockState(keyringSection, true);
@@ -2338,6 +2355,16 @@ function unlockKeyringSection(keyringSection) {
     keyringUnlocked = true;
     applyKeyringLockState(keyringSection, false);
     
+    // Open the section
+    const sectionContent = keyringSection.querySelector('.section-content');
+    const sectionIcon = keyringSection.querySelector('.section-toggle-icon');
+    if (sectionContent) {
+        sectionContent.style.display = 'block';
+    }
+    if (sectionIcon) {
+        sectionIcon.style.transform = 'rotate(180deg)';
+    }
+    
     // Update lock indicator
     const lockIndicator = document.getElementById('lockIndicator');
     lockIndicator.innerHTML = '<i class="fas fa-unlock"></i>';
@@ -2365,6 +2392,16 @@ function unlockKeyringSection(keyringSection) {
 function lockKeyringSection(keyringSection) {
     keyringUnlocked = false;
     applyKeyringLockState(keyringSection, true);
+    
+    // Close the section
+    const sectionContent = keyringSection.querySelector('.section-content');
+    const sectionIcon = keyringSection.querySelector('.section-toggle-icon');
+    if (sectionContent) {
+        sectionContent.style.display = 'none';
+    }
+    if (sectionIcon) {
+        sectionIcon.style.transform = 'rotate(0deg)';
+    }
     
     // Update lock indicator
     const lockIndicator = document.getElementById('lockIndicator');
