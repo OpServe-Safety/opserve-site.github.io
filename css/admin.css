@@ -1499,6 +1499,8 @@
     /* Right-align header text on mobile */
     .dashboard-header h1 {
         text-align: right;
+        width: 100%;
+        flex: 1;
     }
     
     /* Action Buttons */
