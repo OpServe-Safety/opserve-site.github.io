@@ -476,19 +476,45 @@
 }
 
 .btn-icon {
-    padding: 5px 8px;
-    background: #f5f7fa;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    padding: 0;
+    background: transparent !important;
     border: none;
-    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
-    color: #666;
-    font-size: 0.85rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+    font-size: 16px;
+    box-shadow: none !important;
 }
 
 .btn-icon:hover {
-    background: #e43b04;
-    color: white;
+    background: transparent !important;
+    transform: scale(1.15);
+}
+
+.btn-icon:active {
+    transform: scale(0.95);
+}
+
+.btn-icon:focus {
+    outline: none;
+    background: transparent !important;
+}
+
+/* Red delete icon buttons for desktop */
+.btn-icon[style*="color: #dc3545"],
+.btn-icon[onclick*="remove"] {
+    color: #dc3545;
+}
+
+.btn-icon[style*="color: #dc3545"]:hover,
+.btn-icon[onclick*="remove"]:hover {
+    color: #a71d2a !important;
+    background: transparent !important;
 }
 
 /* Mobile Filter Button */
@@ -799,34 +825,47 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    background: #dc3545;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    padding: 0;
+    background: transparent !important;
     border: none;
-    color: white;
-    border-radius: 4px;
-    padding: 4px 8px;
+    color: #dc3545;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
-    opacity: 0.7;
-}
-
-.position-item:hover .position-delete-btn {
-    opacity: 1;
+    font-size: 16px;
+    transition: color 0.2s ease, transform 0.2s ease;
+    box-shadow: none !important;
 }
 
 .position-delete-btn:hover {
-    background: #c82333;
-    transform: scale(1.1);
+    color: #a71d2a !important;
+    background: transparent !important;
+    transform: scale(1.15);
+}
+
+.position-delete-btn:active {
+    transform: scale(0.95);
+}
+
+.position-delete-btn:focus {
+    outline: none;
+    background: transparent !important;
 }
 
 .add-position-btn {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
     border-radius: 50%;
     background: #28a745;
     border: none;
     color: white;
-    font-size: 0.9rem;
+    font-size: 14px;
+    padding: 0;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -838,7 +877,7 @@
 
 .add-position-btn:hover {
     background: #218838;
-    transform: scale(1.1);
+    transform: scale(1.15);
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
 }
 
@@ -977,17 +1016,35 @@
 }
 
 .addon-delete-btn {
-    background: #dc3545;
-    color: white;
-    opacity: 0.7;
-    transition: all 0.2s;
-    min-width: 36px;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    padding: 0;
+    background: transparent !important;
+    border: none;
+    color: #dc3545;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+    box-shadow: none !important;
 }
 
 .addon-delete-btn:hover {
-    opacity: 1;
-    transform: scale(1.1);
-    background: #c82333;
+    color: #a71d2a !important;
+    background: transparent !important;
+    transform: scale(1.15);
+}
+
+.addon-delete-btn:active {
+    transform: scale(0.95);
+}
+
+.addon-delete-btn:focus {
+    outline: none;
+    background: transparent !important;
 }
 
 /* Responsive */
