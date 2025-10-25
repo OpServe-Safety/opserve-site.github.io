@@ -1109,8 +1109,8 @@
         width: calc(100% - 70px) !important;
         z-index: 1000 !important;
         margin: 0 !important;
-        padding-top: 25.7315px !important;
-        padding-bottom: 25.7315px !important;
+        padding-top: 27.6485px !important;
+        padding-bottom: 27.6485px !important;
         padding-left: 20px !important;
         padding-right: 20px !important;
         border-radius: 0 !important;
@@ -1122,6 +1122,11 @@
         align-items: flex-start !important;
         gap: 15px !important;
         display: flex !important;
+    }
+    
+    /* Add top margin to stats-grid to prevent header overlap */
+    .stats-grid {
+        margin-top: 110px !important;
     }
 }
 
@@ -1422,7 +1427,7 @@
         background: url('../images/osg-logo-big.jpg') no-repeat center center;
         background-size: contain;
         position: absolute;
-        left: 15px;
+        left: 55px;
         top: 50%;
         transform: translateY(-50%);
     }
@@ -1437,7 +1442,7 @@
         width: 100% !important;
         z-index: 1001 !important;
         margin: 0 !important;
-        padding: 15px 15px 15px 55px !important;
+        padding: 15.7595px 15px 15.7595px 85px !important;
         border-radius: 0 !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
         background: #1a1a1a !important;
