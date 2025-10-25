@@ -363,8 +363,10 @@ header .btn:focus {
 
 .nav-links .btn {
     margin-left: 20px;
-    padding: 8px 20px;
+    padding: 10px 24px;
     font-size: 0.9rem;
+    min-width: 120px;
+    text-align: center;
 }
 
 .nav-toggle {
