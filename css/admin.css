@@ -1239,9 +1239,9 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
-        margin: -20px -15px 20px calc(-70px - 15px);
-        width: calc(100vw - 70px);
-        padding: 20px 15px 20px calc(70px + 15px);
+        margin: -20px calc(-15px - 70px) 20px -20px;
+        width: 100vw;
+        padding: 20px 20px 20px calc(70px + 20px);
         box-sizing: border-box;
         z-index: 100;
     }
@@ -1350,19 +1350,19 @@
         padding: 8px 16px;
     }
     
-    /* Dashboard Header - Sticky on mobile for true edge-to-edge */
+    /* Dashboard Header - Edge-to-edge on mobile */
     .dashboard-header {
         position: -webkit-sticky;
         position: sticky;
         top: 0;
         z-index: 100;
-        margin: 0 -12px 20px -12px;
+        margin: 0;
         padding: 15px 15px 15px 65px;
         border-radius: 0;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         background: #1a1a1a;
         color: white;
-        width: 100vw;
+        width: 100%;
         box-sizing: border-box;
     }
     
@@ -1381,18 +1381,19 @@
     /* Content area padding below sticky header */
     .dashboard-content,
     .settings-section:first-child {
-        padding: 0 12px;
+        padding: 0 15px;
         margin-top: 20px;
     }
     
     .settings-section {
-        padding: 0 12px;
+        padding: 0 15px;
         margin-bottom: 25px;
     }
     
     /* First section after header needs proper top margin */
     .settings-container {
         margin-top: 20px;
+        padding: 0 15px;
     }
     
     /* Action Buttons */
