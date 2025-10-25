@@ -1405,10 +1405,10 @@
         border-radius: 12px;
     }
     
-    /* Settings container - full width on mobile */
+    /* Settings container - full width, zero padding on mobile */
     .settings-container {
-        margin: 20px 0 0 0;
-        padding: 0;
+        margin: 0 !important;
+        padding: 0 !important;
         max-width: 100%;
         width: 100%;
     }
@@ -1671,5 +1671,7 @@
     .dashboard-container {
         max-width: 100vw;
         overflow-x: hidden;
+        padding: 0;
+        margin: 0;
     }
 }
