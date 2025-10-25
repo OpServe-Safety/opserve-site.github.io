@@ -2623,7 +2623,7 @@ function renderAnalyticsView() {
         <div class="dashboard-header">
             <h1>Analytics</h1>
         </div>
-        <div class="empty-state" style="padding: 100px 20px;">
+        <div class="empty-state">
             <i class="fas fa-chart-bar" style="font-size: 5rem; color: #e0e0e0; margin-bottom: 20px;"></i>
             <h3>Coming Soon</h3>
             <p>Application analytics and insights will be available here.</p>

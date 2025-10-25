@@ -1133,8 +1133,8 @@
         margin-top: 0 !important;
     }
     
-    /* Increase top padding by 10 for empty-state in tablet view */
-    .empty-state {
+    /* Increase top padding by 10 for specific elements in tablet view */
+    .dashboard-main > .empty-state {
         padding-top: 120px !important;
     }
 }
