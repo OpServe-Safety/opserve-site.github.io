@@ -1068,7 +1068,7 @@
     
     .dashboard-main {
         margin-left: 70px;
-        padding: 90px 15px 20px;
+        padding: 20px 15px;
     }
     
     .dashboard-logo h2,
@@ -1154,13 +1154,13 @@
         margin-bottom: 15px;
     }
     
-    /* Mobile menu toggle button - hide when sidebar is active */
+    /* Mobile menu toggle button - smaller with equal spacing */
     .mobile-nav-toggle {
         position: fixed;
-        top: 15px;
-        left: 15px;
-        width: 44px;
-        height: 44px;
+        top: 10px;
+        left: 10px;
+        width: 40px;
+        height: 40px;
         background: #e43b04;
         border: none;
         border-radius: 8px;
@@ -1179,7 +1179,7 @@
     }
     
     .mobile-nav-toggle i {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     
     /* Hide toggle button when sidebar is active - auto-close works via overlay/nav clicks */
@@ -1231,17 +1231,17 @@
         min-width: 600px;
     }
     
-    /* Dashboard Header - Edge to edge on tablet */
+    /* Dashboard Header - Sticky edge to edge on tablet */
     .dashboard-header {
-        position: fixed;
+        position: -webkit-sticky;
+        position: sticky;
         top: 0;
-        left: 70px;
-        right: 0;
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
+        margin: -20px -15px 20px calc(-70px - 15px);
         width: calc(100vw - 70px);
-        padding: 20px 15px;
+        padding: 20px 15px 20px calc(70px + 15px);
         box-sizing: border-box;
         z-index: 100;
     }
@@ -1350,26 +1350,20 @@
         padding: 8px 16px;
     }
     
-    /* Dashboard Header - Fixed on mobile for true edge-to-edge */
+    /* Dashboard Header - Sticky on mobile for true edge-to-edge */
     .dashboard-header {
-        position: fixed;
+        position: -webkit-sticky;
+        position: sticky;
         top: 0;
-        left: 0;
-        right: 0;
         z-index: 100;
-        margin: 0;
-        padding: 15px 15px 15px 75px;
+        margin: 0 -12px 20px -12px;
+        padding: 15px 15px 15px 65px;
         border-radius: 0;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         background: #1a1a1a;
         color: white;
         width: 100vw;
         box-sizing: border-box;
-    }
-    
-    /* Add padding to main content for fixed header */
-    .dashboard-main {
-        padding-top: 70px;
     }
     
     .dashboard-header h1 {
