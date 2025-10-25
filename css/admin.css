@@ -1834,4 +1834,9 @@
     .dashboard-main {
         padding-top: 0 !important;
     }
+    
+    /* Add left padding to nav link text in desktop mode */
+    .dashboard-nav a span {
+        padding-left: 10px;
+    }
 }
