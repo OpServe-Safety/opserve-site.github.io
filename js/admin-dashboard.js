@@ -861,7 +861,7 @@ function addDashboardFooter() {
             margin-top: 40px;
             border-top: 1px solid #e0e0e0;
         `;
-        footer.innerHTML = 'Powered by Evenfall Advantage LLC';
+        footer.innerHTML = 'Powered by Evenfall Advantage LLC &copy; 2025';
         mainContent.appendChild(footer);
     }
 }
