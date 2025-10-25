@@ -1296,7 +1296,10 @@
     .dashboard-main > .dashboard-content > .stats-grid {
         grid-template-columns: 1fr 1fr;
         gap: 15px;
-        padding: 120px 20px 20px 20px !important;
+        padding-top: 120px !important;
+        padding-right: 20px !important;
+        padding-bottom: 20px !important;
+        padding-left: 20px !important;
     }
     
     /* Tables */
