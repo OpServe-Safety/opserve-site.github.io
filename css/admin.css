@@ -1162,18 +1162,18 @@
     /* Service Addon Rows - Mobile 2-Row Layout */
     .addon-row {
         display: grid;
-        grid-template-columns: 1fr 40px;
+        grid-template-columns: 1fr 36px;
         grid-template-rows: auto auto;
-        gap: 8px;
-        padding: 12px;
+        gap: 6px;
+        padding: 10px;
         background: white;
         border-radius: 8px;
         border: 1px solid #e0e0e0;
     }
     
     .addon-input {
-        padding: 10px;
-        font-size: 14px;
+        padding: 8px;
+        font-size: 13px;
         border: 1px solid #ddd;
         border-radius: 6px;
     }
@@ -1181,17 +1181,18 @@
     .addon-name-input {
         grid-column: 1;
         grid-row: 1;
-        font-size: 15px;
+        font-size: 13px;
         font-weight: 500;
-        padding: 10px;
+        padding: 8px;
+        width: 100%;
     }
     
     .addon-delete-btn {
         grid-column: 2;
         grid-row: 1;
-        width: 40px;
-        height: 40px;
-        padding: 8px;
+        width: 36px;
+        height: 36px;
+        padding: 6px;
         background: #dc3545;
         border: none;
         border-radius: 6px;
@@ -1205,25 +1206,26 @@
     .addon-price-input {
         grid-column: 1;
         grid-row: 2;
-        width: 80px;
-        padding: 10px;
-        font-size: 14px;
+        width: 70px;
+        padding: 8px;
+        font-size: 13px;
     }
     
     .addon-unit-input {
         grid-column: 1 / -1;
         grid-row: 2;
-        padding: 10px;
-        font-size: 14px;
-        margin-left: 88px;
+        padding: 8px;
+        font-size: 13px;
+        margin-left: 76px;
+        width: calc(100% - 76px);
     }
     
     .addon-row .add-position-btn {
         width: auto;
-        max-width: 150px;
-        padding: 10px 20px;
-        margin: 8px auto 0;
-        font-size: 14px;
+        max-width: 140px;
+        padding: 8px 16px;
+        margin: 6px auto 0;
+        font-size: 13px;
         border-radius: 6px;
         display: block;
     }
@@ -1231,5 +1233,30 @@
     /* Reduce padding on addon containers */
     .settings-section .section-content > div[style*="background: #f8f9fa"] {
         padding: 12px 8px !important;
+    }
+    
+    /* Override inline grid styles for Position Rates and Service Durations on mobile */
+    .settings-section .section-content > div[style*="background: #f8f9fa"] > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    
+    /* Make position rate and duration cards more compact on mobile */
+    .settings-section .section-content > div[style*="background: #f8f9fa"] > div > div[style*="background: white"] {
+        padding: 10px !important;
+    }
+    
+    .settings-section .section-content > div[style*="background: #f8f9fa"] > div > div[style*="background: white"] label {
+        font-size: 13px !important;
+        margin-bottom: 6px !important;
+    }
+    
+    .settings-section .section-content > div[style*="background: #f8f9fa"] > div > div[style*="background: white"] input {
+        font-size: 13px !important;
+        padding: 8px 8px 8px 25px !important;
+    }
+    
+    .settings-section .section-content > div[style*="background: #f8f9fa"] > div > div[style*="background: white"] span {
+        font-size: 12px !important;
     }
 }
