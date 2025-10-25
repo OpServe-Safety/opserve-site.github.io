@@ -1108,4 +1108,24 @@
         height: 32px;
         font-size: 0.85rem;
     }
+    
+    /* Service Addon Rows - Mobile Optimization */
+    .addon-row {
+        grid-template-columns: 2fr 0.5fr 0.6fr 36px !important;
+        gap: 6px !important;
+    }
+    
+    .addon-row input {
+        padding: 6px 4px !important;
+        font-size: 12px !important;
+    }
+    
+    .addon-row input[type="number"] {
+        width: 100%;
+        min-width: 50px;
+    }
+    
+    .addon-row input[type="text"]:last-of-type {
+        font-size: 11px !important;
+    }
 }

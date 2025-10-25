@@ -1654,20 +1654,20 @@ async function renderSettingsView() {
                         <h4 style="margin-bottom: 15px; color: #333;"><i class="fas ${getServiceIcon(serviceKey)}" style="color: #e43b04;"></i> ${template.name}</h4>
                         
                         ${template.addons.map((addon, index) => `
-                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: center;">
+                            <div class="addon-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: center;">
                                 <input type="text" value="${addon.name}" 
                                        onchange="updateAddonName('${serviceKey}', ${index}, this.value)"
                                        placeholder="Add-on name"
-                                       style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                                       style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
                                 <input type="number" value="${addon.price}" 
                                        onchange="updateAddonPrice('${serviceKey}', ${index}, parseFloat(this.value))"
                                        min="0" step="0.01" placeholder="Price"
-                                       style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                                       style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
                                 <input type="text" value="${addon.unit}" 
                                        onchange="updateAddonUnit('${serviceKey}', ${index}, this.value)"
                                        placeholder="per unit"
-                                       style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px;">
-                                <button onclick="removeAddon('${serviceKey}', ${index})" class="btn btn-icon" style="background: #dc3545; color: white; opacity: 0.7; transition: all 0.2s;" 
+                                       style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                                <button onclick="removeAddon('${serviceKey}', ${index})" class="btn btn-icon" style="background: #dc3545; color: white; opacity: 0.7; transition: all 0.2s; min-width: 36px;" 
                                         onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.background='#c82333';" 
                                         onmouseout="this.style.opacity='0.7'; this.style.transform='scale(1)'; this.style.background='#dc3545';" 
                                         title="Remove">
@@ -1676,14 +1676,14 @@ async function renderSettingsView() {
                             </div>
                         `).join('')}
                         
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-top: 15px; align-items: center;">
+                        <div class="addon-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-top: 15px; align-items: center;">
                             <input type="text" id="newAddonName_${serviceKey}" placeholder="Add-on name..." 
-                                   style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                                   style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
                             <input type="number" id="newAddonPrice_${serviceKey}" placeholder="Price" min="0" step="0.01" 
-                                   style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                                   style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
                             <input type="text" id="newAddonUnit_${serviceKey}" placeholder="per unit" 
-                                   style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px;">
-                            <button onclick="addAddon('${serviceKey}')" class="add-position-btn" title="Add add-on">
+                                   style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                            <button onclick="addAddon('${serviceKey}')" class="add-position-btn" title="Add add-on" style="min-width: 36px;">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
