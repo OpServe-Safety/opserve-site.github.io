@@ -1874,7 +1874,7 @@ async function renderSettingsView() {
                 
                 <div class="setting-row" style="text-align: center;">
                     <button class="btn btn-primary" onclick="testEmailConnection()">
-                        <i class="fas fa-paper-plane"></i> Test Email Connection
+                        <i class="fas fa-paper-plane"></i> Test Connection
                     </button>
                 </div>
                 
