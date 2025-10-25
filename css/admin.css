@@ -1259,19 +1259,24 @@
         min-width: 600px;
     }
     
-    /* Dashboard Header - Sticky edge to edge on tablet */
+    /* Dashboard Header - Fixed edge to edge on tablet */
     .dashboard-header {
-        position: -webkit-sticky;
-        position: sticky;
+        position: fixed;
         top: 0;
+        left: 70px;
+        width: calc(100vw - 70px);
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
-        margin: 0 calc(-70px) 0 0;
-        width: 100vw;
-        padding: 20px 20px 20px calc(70px + 20px);
+        margin: 0;
+        padding: 20px;
         box-sizing: border-box;
         z-index: 100;
+    }
+    
+    /* Add top padding to main content for fixed header on tablet */
+    .dashboard-main {
+        padding-top: 100px !important;
     }
     
     .dashboard-user {
