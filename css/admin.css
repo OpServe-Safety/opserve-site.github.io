@@ -1267,6 +1267,7 @@
     }
     
     /* Dashboard Header - Fixed edge to edge on tablet (same approach as mobile) */
+    .dashboard-container .dashboard-main .dashboard-header,
     .dashboard-main .dashboard-header,
     .dashboard-header {
         position: fixed !important;
@@ -1287,6 +1288,7 @@
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 15px !important;
+        display: flex !important;
     }
     
     .dashboard-user {
