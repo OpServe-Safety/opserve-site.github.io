@@ -144,7 +144,7 @@
 
 /* Sidebar */
 .dashboard-sidebar {
-    width: 260px;
+    width: 156px;
     background: #1a1a1a;
     color: white;
     padding: 10px 0;
@@ -249,7 +249,7 @@
 
 /* Main Content */
 .dashboard-main {
-    margin-left: 260px;
+    margin-left: 156px;
     flex: 1;
     padding: 0;
     max-width: 100%;
@@ -1413,6 +1413,20 @@
         padding: 8px 16px;
     }
     
+    /* Show logo in mobile header */
+    .dashboard-header::before {
+        content: '';
+        display: block;
+        width: 38.4px;
+        height: 38.4px;
+        background: url('../images/osg-logo-big.jpg') no-repeat center center;
+        background-size: contain;
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
     /* Dashboard Header - Fixed like navbar, edge-to-edge on mobile */
     .dashboard-container .dashboard-main .dashboard-header,
     .dashboard-main .dashboard-header,
@@ -1423,7 +1437,7 @@
         width: 100% !important;
         z-index: 1001 !important;
         margin: 0 !important;
-        padding: 15px 15px 15px 65px !important;
+        padding: 15px 15px 15px 55px !important;
         border-radius: 0 !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
         background: #1a1a1a !important;
