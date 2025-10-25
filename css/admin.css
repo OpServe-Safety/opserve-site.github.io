@@ -1422,24 +1422,16 @@
         padding: 8px 16px;
     }
     
-    /* Show logo in mobile header ONLY when sidebar is HIDDEN */
-    .dashboard-main .dashboard-header::before {
-        content: '';
-        display: block;
-        width: 38.4px;
-        height: 38.4px;
-        background: url('../images/osg-logo-big.jpg') no-repeat center center;
-        background-size: contain;
-        position: absolute;
-        left: 55px;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 1;
+    /* Ensure sidebar logo is visible and properly sized on mobile */
+    .dashboard-sidebar .dashboard-logo {
+        display: block !important;
+        padding: 10px;
     }
     
-    /* Hide header logo when sidebar is active/open */
-    .dashboard-sidebar.active ~ .dashboard-main .dashboard-header::before {
-        display: none !important;
+    .dashboard-sidebar .dashboard-logo img {
+        width: 38.4px !important;
+        height: auto;
+        margin: 0 auto;
     }
     
     /* Dashboard Header - Fixed like navbar, edge-to-edge on mobile */
@@ -1452,7 +1444,7 @@
         width: 100% !important;
         z-index: 1001 !important;
         margin: 0 !important;
-        padding: 15.7595px 15px 15.7595px 85px !important;
+        padding: 15.7595px 15px 15.7595px 65px !important;
         border-radius: 0 !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
         background: #1a1a1a !important;
