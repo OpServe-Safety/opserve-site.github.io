@@ -1140,6 +1140,16 @@
     .dashboard-main > .settings-container {
         padding-top: 120px !important;
     }
+    
+    /* Stats Grid - Tablet padding */
+    .dashboard-main > .stats-grid,
+    .dashboard-main > .dashboard-content > .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        padding-right: 20px !important;
+        padding-bottom: 20px !important;
+        padding-left: 20px !important;
+    }
 }
 
 /* Mobile auto-hide sidebar */
@@ -1289,17 +1299,6 @@
     
     .search-box {
         width: 100%;
-    }
-    
-    /* Stats Grid - Tablet */
-    .dashboard-main > .stats-grid,
-    .dashboard-main > .dashboard-content > .stats-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        padding-top: 120px !important;
-        padding-right: 20px !important;
-        padding-bottom: 20px !important;
-        padding-left: 20px !important;
     }
     
     /* Tables */
