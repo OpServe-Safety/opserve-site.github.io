@@ -116,18 +116,16 @@ function setupMobileNavToggle() {
         overlay.className = 'sidebar-overlay';
         document.body.appendChild(overlay);
         
-        // Toggle sidebar
+        // Toggle sidebar (hide button when open)
         toggleBtn.addEventListener('click', () => {
             const sidebar = document.querySelector('.dashboard-sidebar');
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
             
-            // Change icon
-            const icon = toggleBtn.querySelector('i');
+            // Hide toggle button when sidebar is open
             if (sidebar.classList.contains('active')) {
-                icon.className = 'fas fa-times';
-            } else {
-                icon.className = 'fas fa-bars';
+                toggleBtn.style.opacity = '0';
+                toggleBtn.style.pointerEvents = 'none';
             }
         });
         
@@ -136,10 +134,11 @@ function setupMobileNavToggle() {
             const sidebar = document.querySelector('.dashboard-sidebar');
             sidebar.classList.remove('active');
             overlay.classList.remove('active');
-            toggleBtn.querySelector('i').className = 'fas fa-bars';
+            toggleBtn.style.opacity = '1';
+            toggleBtn.style.pointerEvents = 'auto';
         });
         
-        // Close sidebar when clicking a nav link on mobile
+        // Auto-close sidebar when clicking a nav link on mobile
         const navLinks = document.querySelectorAll('.dashboard-nav a');
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
@@ -147,7 +146,8 @@ function setupMobileNavToggle() {
                     const sidebar = document.querySelector('.dashboard-sidebar');
                     sidebar.classList.remove('active');
                     overlay.classList.remove('active');
-                    toggleBtn.querySelector('i').className = 'fas fa-bars';
+                    toggleBtn.style.opacity = '1';
+                    toggleBtn.style.pointerEvents = 'auto';
                 }
             });
         });
