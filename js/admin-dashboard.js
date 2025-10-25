@@ -1378,9 +1378,9 @@ async function renderSettingsView() {
                 </div>
             </div>
             
-            <!-- Automated Email Templates Section -->
+            <!-- Automated Emails Section -->
             <div class="settings-section">
-                <h2><i class="fas fa-envelope"></i> Automated Email Templates</h2>
+                <h2><i class="fas fa-envelope"></i> Automated Emails</h2>
                 <div class="section-content">
                     <p style="color: #6c757d; margin-bottom: 25px;">Customize the automated emails sent to applicants and contact form submitters. Use placeholders like {firstName}, {position}, {name}, {service}.</p>
                 
@@ -1718,9 +1718,9 @@ async function renderSettingsView() {
                 </div>
             </div>
             
-            <!-- Integration Settings Section -->
+            <!-- Integration Keyring Section -->
             <div class="settings-section">
-                <h2><i class="fas fa-plug"></i> Integration Settings</h2>
+                <h2><i class="fas fa-key"></i> Integration Keyring</h2>
                 <div class="section-content">
                     <p style="color: #6c757d; margin-bottom: 25px;">Connect third-party services and configure integrations.</p>
                 
