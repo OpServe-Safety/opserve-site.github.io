@@ -1723,8 +1723,7 @@ async function renderSettingsView() {
                                        onchange="updateAddonUnit('${serviceKey}', ${index}, this.value)"
                                        placeholder="per unit"
                                        class="addon-input addon-unit-input">
-                                <button onclick="removeAddon('${serviceKey}', ${index})" class="btn btn-icon addon-delete-btn" 
-                                        title="Remove">
+                                <button onclick="removeAddon('${serviceKey}', ${index})" class="btn btn-icon addon-delete-btn">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -1754,7 +1753,7 @@ async function renderSettingsView() {
                     ${settings.quoteSettings.paymentTerms.map((term, index) => `
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                             <span style="flex: 1; padding: 10px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">${term}</span>
-                            <button onclick="removePaymentTerm(${index})" class="btn btn-icon" style="color: #dc3545;" title="Remove">
+                            <button onclick="removePaymentTerm(${index})" class="btn btn-icon" style="color: #dc3545;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
