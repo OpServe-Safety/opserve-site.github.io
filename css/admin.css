@@ -1353,14 +1353,32 @@
     }
     
     /* Service Addon Rows - Tablet Optimization */
-    .addon-row {
+    .settings-section .section-content .addon-row {
         grid-template-columns: 2fr 0.6fr 0.9fr 36px;
         gap: 8px;
     }
     
-    .addon-input {
+    .settings-section .section-content .addon-input {
         font-size: 13px;
         padding: 8px 6px;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .settings-section .section-content .addon-name-input {
+        min-width: 0;
+        max-width: 100%;
+    }
+    
+    .settings-section .section-content .addon-price-input {
+        min-width: 0;
+        max-width: 100%;
+    }
+    
+    .settings-section .section-content .addon-unit-input {
+        min-width: 0;
+        max-width: 100%;
     }
 }
 
