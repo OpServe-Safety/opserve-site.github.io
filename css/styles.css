@@ -889,14 +889,15 @@ header .btn:focus {
         position: fixed;
         top: 0;
         right: -100%;
-        width: 80%;
-        max-width: 400px;
+        width: 75%;
+        max-width: 350px;
         height: 100vh;
         background-color: var(--white);
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
-        padding-top: 80px;
+        padding-top: 70px;
+        gap: 5px;
         transition: var(--transition);
         box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
     }
@@ -906,17 +907,18 @@ header .btn:focus {
     }
 
     .nav-links li {
-        margin: 8px 0;
+        margin: 0;
     }
 
     .nav-links a {
-        font-size: 1.05rem;
+        font-size: 1rem;
+        padding: 8px 20px;
     }
 
     .nav-links .btn {
-        margin: 12px 0 0;
-        padding: 10px 24px;
-        font-size: 0.95rem;
+        margin: 8px 0 0;
+        padding: 10px 28px;
+        font-size: 0.9rem;
     }
 
     .nav-toggle {
