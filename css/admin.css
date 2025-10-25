@@ -706,11 +706,21 @@
     font-size: 1.5rem;
     color: #1a1a1a;
     margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
 
-.settings-section h2 i {
+.settings-section h2 i:not(.section-toggle-icon) {
     color: #e43b04;
     margin-right: 10px;
+}
+
+.settings-section h2 .section-toggle-icon {
+    color: #e43b04;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .positions-list {
@@ -1113,6 +1123,17 @@
     /* Section cards scroll normally with proper spacing */
     .settings-section {
         margin-bottom: 25px;
+    }
+    
+    .settings-section h2 {
+        font-size: 1.2rem;
+        padding-right: 0;
+        flex-wrap: nowrap;
+    }
+    
+    .settings-section h2 .section-toggle-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
     }
     
     .settings-section h3 {

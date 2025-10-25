@@ -2129,7 +2129,7 @@ function initializeCollapsibleSections() {
             // Add collapse icon
             const icon = document.createElement('i');
             icon.className = 'fas fa-chevron-down section-toggle-icon';
-            icon.style.cssText = 'float: right; transition: transform 0.3s ease; color: #e43b04; cursor: pointer;';
+            icon.style.cssText = 'transition: transform 0.3s ease; cursor: pointer;';
             header.appendChild(icon);
             
             // Make header clickable
