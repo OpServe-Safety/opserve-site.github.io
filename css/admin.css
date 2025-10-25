@@ -1351,8 +1351,11 @@
     .search-box {
         flex: 1;
     }
-    
-    /* Service Addon Rows - Tablet Optimization */
+}
+
+/* Tablet-specific fixes (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    /* Service Addon Rows - Tablet-only Optimization */
     .settings-section .section-content > div[style*="background: #f8f9fa"] {
         width: 100% !important;
         max-width: 100% !important;
@@ -1377,18 +1380,8 @@
         box-sizing: border-box !important;
     }
     
-    .settings-section .section-content .addon-name-input {
-        min-width: 0 !important;
-        max-width: 100% !important;
-        width: 100% !important;
-    }
-    
-    .settings-section .section-content .addon-price-input {
-        min-width: 0 !important;
-        max-width: 100% !important;
-        width: 100% !important;
-    }
-    
+    .settings-section .section-content .addon-name-input,
+    .settings-section .section-content .addon-price-input,
     .settings-section .section-content .addon-unit-input {
         min-width: 0 !important;
         max-width: 100% !important;
