@@ -1422,7 +1422,7 @@
         padding: 8px 16px;
     }
     
-    /* Show logo in mobile header ONLY */
+    /* Show logo in mobile header ONLY when sidebar is HIDDEN */
     .dashboard-main .dashboard-header::before {
         content: '';
         display: block;
@@ -1437,8 +1437,8 @@
         z-index: 1;
     }
     
-    /* Hide sidebar logo on mobile */
-    .dashboard-sidebar .dashboard-logo {
+    /* Hide header logo when sidebar is active/open */
+    .dashboard-sidebar.active ~ .dashboard-main .dashboard-header::before {
         display: none !important;
     }
     
