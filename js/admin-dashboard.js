@@ -2096,6 +2096,9 @@ async function renderSettingsView() {
     
     // Fix accessibility issues
     fixFormAccessibility();
+    
+    // Initialize keyring lock protection
+    initializeKeyringLock();
 }
 
 // Fix form accessibility - add missing id and name attributes
