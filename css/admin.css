@@ -1295,7 +1295,7 @@
     .stats-grid {
         grid-template-columns: 1fr 1fr;
         gap: 15px;
-        padding: 120px 10px 20px 10px !important;
+        padding: 120px 20px 20px 20px !important;
     }
     
     /* Tables */
