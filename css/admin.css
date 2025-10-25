@@ -1077,7 +1077,7 @@
     
     /* Settings container - tablet padding */
     .settings-container {
-        padding: 20px !important;
+        padding: 120px 20px 20px 20px !important;
     }
     
     .dashboard-logo h2,
@@ -1133,10 +1133,8 @@
         margin-top: 0 !important;
     }
     
-    /* Increase top padding by 10 for specific elements in tablet view */
-    .stats-grid,
-    .empty-state,
-    .settings-container {
+    /* Increase top padding by 10 for empty-state in tablet view */
+    .empty-state {
         padding-top: 120px !important;
     }
 }
@@ -1294,7 +1292,7 @@
     .stats-grid {
         grid-template-columns: 1fr 1fr;
         gap: 15px;
-        padding: 20px !important;
+        padding: 120px 20px 20px 20px !important;
     }
     
     /* Tables */
