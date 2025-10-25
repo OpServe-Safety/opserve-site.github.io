@@ -1264,19 +1264,22 @@
     /* Dashboard Header - Fixed edge to edge on tablet */
     .dashboard-header {
         position: fixed !important;
+        display: flex !important;
         top: 0 !important;
         left: 70px !important;
-        width: calc(100vw - 70px) !important;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+        right: 0 !important;
+        width: auto !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 15px !important;
         margin: 0 !important;
         padding: 20px !important;
-        box-sizing: border-box;
+        box-sizing: border-box !important;
         z-index: 1000 !important;
         background: #1a1a1a !important;
         color: white !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        border-radius: 0 !important;
     }
     
     .dashboard-user {
