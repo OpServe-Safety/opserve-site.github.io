@@ -909,6 +909,9 @@ header .btn:focus {
 
     .nav-links li {
         margin: 0;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
     }
 
     .nav-links a {
@@ -918,8 +921,10 @@ header .btn:focus {
 
     .nav-links .btn {
         margin: 8px 0 0;
-        padding: 10px 28px;
+        padding: 12px 30px;
         font-size: 0.9rem;
+        min-width: 140px;
+        text-align: center;
     }
 
     .nav-toggle {
