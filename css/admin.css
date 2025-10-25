@@ -1097,7 +1097,7 @@
     
     .dashboard-main {
         margin-left: 70px;
-        padding: 15px 10px;
+        padding: 15px 8px;
     }
     
     /* Stats Grid - Single Column */
@@ -1161,30 +1161,49 @@
     
     /* Service Addon Rows - Mobile Optimization */
     .addon-row {
-        grid-template-columns: 1.4fr 50px 1fr 36px;
-        gap: 4px;
+        grid-template-columns: 1fr 45px 0.85fr 32px;
+        gap: 3px;
     }
     
     .addon-input {
-        padding: 6px 4px;
-        font-size: 11px;
+        padding: 5px 3px;
+        font-size: 10px;
     }
     
     .addon-name-input {
-        font-size: 12px;
+        font-size: 11px;
+        padding: 5px 4px;
     }
     
     .addon-price-input {
-        width: 50px;
-        max-width: 50px;
-        min-width: 50px;
-        padding: 6px 2px;
-        font-size: 11px;
+        width: 45px;
+        max-width: 45px;
+        min-width: 45px;
+        padding: 5px 2px;
+        font-size: 10px;
+        text-align: center;
     }
     
     .addon-unit-input {
-        font-size: 10px;
-        padding: 6px 4px;
+        font-size: 9px;
+        padding: 5px 3px;
         width: 100%;
+    }
+    
+    .addon-delete-btn {
+        width: 32px;
+        min-width: 32px;
+        padding: 4px;
+    }
+    
+    .addon-row .add-position-btn {
+        width: 32px;
+        min-width: 32px;
+        padding: 4px;
+    }
+    
+    /* Reduce padding on addon containers */
+    .settings-section .section-content > div[style*="background: #f8f9fa"] {
+        padding: 12px 8px !important;
     }
 }
