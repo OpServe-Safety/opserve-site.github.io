@@ -843,6 +843,29 @@ async function initializeSettings() {
     }
 }
 
+// Add footer to dashboard pages
+function addDashboardFooter() {
+    const mainContent = document.querySelector('.dashboard-main');
+    if (!mainContent) return;
+    
+    // Check if footer already exists
+    let footer = mainContent.querySelector('.dashboard-footer');
+    if (!footer) {
+        footer = document.createElement('div');
+        footer.className = 'dashboard-footer';
+        footer.style.cssText = `
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+            font-size: 0.9rem;
+            margin-top: 40px;
+            border-top: 1px solid #e0e0e0;
+        `;
+        footer.innerHTML = 'Powered by Evenfall Advantage LLC';
+        mainContent.appendChild(footer);
+    }
+}
+
 // Switch between views
 function switchView(view) {
     currentView = view;
@@ -1012,6 +1035,9 @@ function renderApplicationsView() {
     document.getElementById('searchInput').addEventListener('input', function(e) {
         searchApplications(e.target.value);
     });
+    
+    // Add footer
+    addDashboardFooter();
 }
 
 // Store which sections are currently open
@@ -2099,6 +2125,9 @@ async function renderSettingsView() {
     
     // Initialize keyring lock protection
     initializeKeyringLock();
+    
+    // Add footer
+    addDashboardFooter();
 }
 
 // Fix form accessibility - add missing id and name attributes
@@ -2696,6 +2725,9 @@ async function renderContactsView() {
     
     // Attach event listeners
     setupContactsEventListeners();
+    
+    // Add footer
+    addDashboardFooter();
 }
 
 // Render quotes view
@@ -2943,6 +2975,9 @@ async function renderQuotesView() {
     
     // Attach event listeners
     setupQuotesEventListeners();
+    
+    // Add footer
+    addDashboardFooter();
 }
 
 function renderAnalyticsView() {
@@ -2957,6 +2992,9 @@ function renderAnalyticsView() {
             <p>Application analytics and insights will be available here.</p>
         </div>
     `;
+    
+    // Add footer
+    addDashboardFooter();
 }
 
 // Toggle position active state
