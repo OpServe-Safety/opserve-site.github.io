@@ -1292,7 +1292,8 @@
     }
     
     /* Stats Grid - Tablet */
-    .stats-grid {
+    .dashboard-main > .stats-grid,
+    .dashboard-main > .dashboard-content > .stats-grid {
         grid-template-columns: 1fr 1fr;
         gap: 15px;
         padding: 120px 20px 20px 20px !important;
