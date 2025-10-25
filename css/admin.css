@@ -1107,13 +1107,12 @@
     
     .dashboard-main {
         margin-left: 0;
-        padding: 0;
+        padding: 60px 0 0 0;
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
-        height: 100vh;
-        overflow-y: auto;
-        position: relative;
+        min-height: 100vh;
+        box-sizing: border-box;
     }
     
     .settings-section,
@@ -1123,11 +1122,11 @@
         box-sizing: border-box;
     }
     
-    /* Section cards scroll normally with proper spacing */
+    /* Section cards - full width with rounded corners */
     .settings-section {
         margin: 0 0 15px 0;
-        border-radius: 0;
-        padding: 20px;
+        border-radius: 12px;
+        padding: 25px 20px;
     }
     
     .settings-section h2 {
@@ -1352,11 +1351,12 @@
         padding: 8px 16px;
     }
     
-    /* Dashboard Header - Edge-to-edge on mobile */
+    /* Dashboard Header - Fixed like navbar, edge-to-edge */
     .dashboard-header {
-        position: -webkit-sticky;
-        position: sticky;
+        position: fixed;
         top: 0;
+        left: 0;
+        width: 100%;
         z-index: 100;
         margin: 0;
         padding: 15px 15px 15px 65px;
@@ -1364,7 +1364,6 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         background: #1a1a1a;
         color: white;
-        width: 100%;
         box-sizing: border-box;
     }
     
@@ -1388,9 +1387,9 @@
     }
     
     .settings-section {
-        padding: 20px;
+        padding: 25px 20px;
         margin: 0 0 15px 0;
-        border-radius: 0;
+        border-radius: 12px;
     }
     
     /* Settings container - no padding, just top margin */
