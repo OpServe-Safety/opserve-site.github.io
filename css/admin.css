@@ -266,6 +266,7 @@
     display: flex;
     align-items: center;
     width: 100%;
+    position: relative;
 }
 
 /* Content after header needs padding */
@@ -1072,7 +1073,6 @@
     .dashboard-main {
         margin-left: 70px;
         padding: 0;
-        padding-top: 90px;
     }
     
     /* Settings container - tablet padding */
@@ -1271,11 +1271,12 @@
         align-items: flex-start;
         gap: 15px;
         margin: 0 !important;
-        padding: 20px;
+        padding: 20px !important;
         box-sizing: border-box;
         z-index: 1000 !important;
-        background: #1a1a1a;
-        color: white;
+        background: #1a1a1a !important;
+        color: white !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
     }
     
     .dashboard-user {
