@@ -533,6 +533,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             emailHTML
                         );
                     }
+                    
+                    // Send admin notification if enabled
+                    if (settings.emailNotifications?.notifyAdminOnApplication && settings.emailNotifications?.adminEmail) {
+                        const adminEmailHTML = generateAdminApplicationNotificationHTML(formData, firstName, lastName);
+                        await sendEmailViaResend(
+                            settings.emailNotifications.adminEmail,
+                            `New Application Received - ${firstName} ${lastName}`,
+                            adminEmailHTML
+                        );
+                    }
                 } catch (emailError) {
                     console.error('Failed to send confirmation email:', emailError);
                     // Continue anyway - application was saved
@@ -684,6 +694,163 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>OpServe Safety Group | Professional Security Services</p>
                     <p><a href="https://opservesafetygroup.com">opservesafetygroup.com</a></p>
                     <p>This is an automated message. Please do not reply to this email.</p>
+                </div>
+            </body>
+            </html>
+        `;
+    }
+    
+    // Generate admin notification email for new application
+    function generateAdminApplicationNotificationHTML(formData, firstName, lastName) {
+        const position = formData.get('position');
+        const email = formData.get('email');
+        const phone = formData.get('phone');
+        const city = formData.get('city');
+        const state = formData.get('state');
+        const certifications = formData.get('certifications');
+        const experience = formData.get('experience');
+        const availability = formData.get('availability');
+        
+        return `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 700px; margin: 0 auto; padding: 20px; }
+                    .header { background: #e43b04; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                    .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+                    .info-row { margin: 15px 0; padding: 12px; background: white; border-radius: 6px; border-left: 4px solid #e43b04; }
+                    .label { font-weight: bold; color: #e43b04; display: inline-block; width: 150px; }
+                    .value { color: #333; }
+                    .button { display: inline-block; background: #e43b04; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+                    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>🎉 New Application Received</h1>
+                    <p>Someone has applied for a position</p>
+                </div>
+                <div class="content">
+                    <h2>Applicant Details</h2>
+                    <div class="info-row">
+                        <span class="label">Name:</span>
+                        <span class="value">${firstName} ${lastName}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Position:</span>
+                        <span class="value">${position}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Email:</span>
+                        <span class="value"><a href="mailto:${email}">${email}</a></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Phone:</span>
+                        <span class="value"><a href="tel:${phone}">${phone}</a></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Location:</span>
+                        <span class="value">${city}, ${state}</span>
+                    </div>
+                    ${certifications ? `
+                    <div class="info-row">
+                        <span class="label">Certifications:</span>
+                        <span class="value">${certifications}</span>
+                    </div>
+                    ` : ''}
+                    ${experience ? `
+                    <div class="info-row">
+                        <span class="label">Experience:</span>
+                        <span class="value">${experience}</span>
+                    </div>
+                    ` : ''}
+                    ${availability ? `
+                    <div class="info-row">
+                        <span class="label">Availability:</span>
+                        <span class="value">${availability}</span>
+                    </div>
+                    ` : ''}
+                    <center>
+                        <a href="https://opservesafetygroup.com/admin-dashboard.html#applications" class="button">View in Dashboard</a>
+                    </center>
+                    <p style="margin-top: 30px; color: #666; font-size: 14px;">
+                        <strong>Next Steps:</strong> Review the full application details in your admin dashboard, including work history and uploaded documents.
+                    </p>
+                </div>
+                <div class="footer">
+                    <p>OpServe Safety Group Admin Notification</p>
+                    <p><a href="https://opservesafetygroup.com/admin-dashboard.html">Go to Dashboard</a></p>
+                </div>
+            </body>
+            </html>
+        `;
+    }
+    
+    // Generate admin notification email for contact form submission
+    function generateAdminContactNotificationHTML(formData) {
+        const name = formData.get('name');
+        const email = formData.get('email');
+        const phone = formData.get('phone');
+        const service = formData.get('service');
+        const message = formData.get('message');
+        
+        return `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 700px; margin: 0 auto; padding: 20px; }
+                    .header { background: #e43b04; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                    .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+                    .info-row { margin: 15px 0; padding: 12px; background: white; border-radius: 6px; border-left: 4px solid #e43b04; }
+                    .label { font-weight: bold; color: #e43b04; display: inline-block; width: 120px; }
+                    .value { color: #333; }
+                    .message-box { background: white; padding: 20px; border-radius: 6px; border: 2px solid #e43b04; margin: 20px 0; }
+                    .button { display: inline-block; background: #e43b04; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+                    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>💬 New Contact Form Submission</h1>
+                    <p>Someone has reached out for a quote</p>
+                </div>
+                <div class="content">
+                    <h2>Contact Details</h2>
+                    <div class="info-row">
+                        <span class="label">Name:</span>
+                        <span class="value">${name}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Email:</span>
+                        <span class="value"><a href="mailto:${email}">${email}</a></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Phone:</span>
+                        <span class="value"><a href="tel:${phone}">${phone}</a></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Service:</span>
+                        <span class="value">${service}</span>
+                    </div>
+                    <div class="message-box">
+                        <h3 style="margin-top: 0; color: #e43b04;">Message:</h3>
+                        <p style="white-space: pre-wrap;">${message}</p>
+                    </div>
+                    <center>
+                        <a href="mailto:${email}" class="button">Reply to ${name}</a>
+                    </center>
+                    <p style="margin-top: 30px; color: #666; font-size: 14px;">
+                        <strong>Next Steps:</strong> View full details in your dashboard and follow up with the client.
+                    </p>
+                </div>
+                <div class="footer">
+                    <p>OpServe Safety Group Admin Notification</p>
+                    <p><a href="https://opservesafetygroup.com/admin-dashboard.html#contacts">Go to Dashboard</a></p>
+                    <p>You can reply directly to this email to contact ${name}</p>
                 </div>
             </body>
             </html>
@@ -1171,6 +1338,17 @@ document.addEventListener('DOMContentLoaded', function() {
                             formData.get('email'),
                             contactEmailTemplate.subject,
                             emailHTML
+                        );
+                    }
+                    
+                    // Send admin notification if enabled
+                    if (settings.emailNotifications?.notifyAdminOnContact && settings.emailNotifications?.adminEmail) {
+                        const adminEmailHTML = generateAdminContactNotificationHTML(formData);
+                        await sendEmailViaResend(
+                            settings.emailNotifications.adminEmail,
+                            `New Contact Form Submission - ${formData.get('name')}`,
+                            adminEmailHTML,
+                            formData.get('email') // Set reply-to to the contact's email
                         );
                     }
                 } catch (emailError) {
