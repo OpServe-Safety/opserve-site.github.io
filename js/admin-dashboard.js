@@ -5827,18 +5827,22 @@ async function testEmailConnection() {
         
         const fromEmail = emailConfig.fromEmail || 'noreply@opservesafetygroup.com';
         const { data: { session } } = await window.supabaseClient.auth.getSession();
-        const testEmailAddress = session?.user?.email || emailConfig.adminEmail || 'admin@opservesafetygroup.com';
+        const testEmailAddress = session?.user?.email || 'admin@opservesafetygroup.com';
         
-        // Send test email via Resend API
-        const response = await fetch('https://api.resend.com/emails', {
+        // Get Supabase URL from client
+        const supabaseUrl = window.supabaseClient.supabaseUrl;
+        const anonKey = window.supabaseClient.supabaseKey;
+        
+        // Send test email via Supabase Edge Function
+        const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${emailConfig.apiKey}`,
+                'Authorization': `Bearer ${anonKey}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 from: `OpServe Safety Group <${fromEmail}>`,
-                to: [testEmailAddress],
+                to: testEmailAddress,
                 subject: 'Test Email - OpServe Admin Dashboard',
                 html: `
                     <!DOCTYPE html>
