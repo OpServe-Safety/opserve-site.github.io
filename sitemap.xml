@@ -7,7 +7,7 @@
     <!-- Homepage -->
     <url>
         <loc>https://opservesafetygroup.com/</loc>
-        <lastmod>2025-01-23</lastmod>
+        <lastmod>2025-10-26</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
@@ -15,23 +15,38 @@
     <!-- Main Sections (via anchors) -->
     <url>
         <loc>https://opservesafetygroup.com/#about</loc>
-        <lastmod>2025-01-23</lastmod>
+        <lastmod>2025-10-26</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <url>
         <loc>https://opservesafetygroup.com/#services</loc>
-        <lastmod>2025-01-23</lastmod>
+        <lastmod>2025-10-26</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <url>
         <loc>https://opservesafetygroup.com/#contact</loc>
-        <lastmod>2025-01-23</lastmod>
+        <lastmod>2025-10-26</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
+    </url>
+    
+    <!-- Legal Pages -->
+    <url>
+        <loc>https://opservesafetygroup.com/privacy-policy.html</loc>
+        <lastmod>2025-10-26</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    
+    <url>
+        <loc>https://opservesafetygroup.com/terms-of-service.html</loc>
+        <lastmod>2025-10-26</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.5</priority>
     </url>
 
 </urlset>
