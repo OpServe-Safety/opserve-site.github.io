@@ -226,6 +226,17 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Apply Now button not found');
     }
     
+    // Open Modal from hero button (mobile only)
+    const heroApplyBtn = document.getElementById('heroApplyBtn');
+    if (heroApplyBtn) {
+        heroApplyBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Hero Apply Now button clicked');
+            openModal();
+        });
+    }
+    
     // Open Modal from footer link
     const footerApplyLink = document.querySelector('.footer-apply-link');
     if (footerApplyLink) {

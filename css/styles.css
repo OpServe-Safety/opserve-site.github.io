@@ -435,6 +435,21 @@ header .btn:focus {
     min-width: 180px;
 }
 
+/* Mobile-only Apply Now button - hidden on desktop */
+.mobile-only {
+    display: none;
+}
+
+.btn-apply {
+    background: #28a745;
+    border-color: #28a745;
+}
+
+.btn-apply:hover {
+    background: #218838;
+    border-color: #1e7e34;
+}
+
 /* About Section */
 .about {
     padding: 100px 0;
@@ -1488,6 +1503,11 @@ input[type="date"]:focus {
     
     .hero-buttons .btn {
         width: 100%;
+    }
+    
+    /* Show Apply Now button on mobile */
+    .mobile-only {
+        display: block;
     }
     
     /* Services section */
