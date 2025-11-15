@@ -273,6 +273,8 @@
             <h2>Join Our Team</h2>
             <p>Fill out the form below to apply for a position with OpServe Safety Group.</p>
             <form id="applicationForm" class="application-form">
+                <!-- Honeypot field - hidden from users, catches bots -->
+                <input type="text" name="website" id="website" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1" autocomplete="off">
                 <div class="form-row">
                     <div class="form-group" style="flex: 2;">
                         <input type="text" id="firstName" name="firstName" placeholder="First Name" required autocomplete="given-name">
@@ -369,6 +371,8 @@
                 </div>
             </div>
             <form id="contactForm" class="contact-modal-form">
+                <!-- Honeypot field - hidden from users, catches bots -->
+                <input type="text" name="company" id="company" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1" autocomplete="off">
                 <div class="form-group">
                     <input type="text" id="contactName" name="name" placeholder="Your Full Name" required autocomplete="name">
                 </div>

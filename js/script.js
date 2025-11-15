@@ -56,6 +56,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('resume');
     const fileNameDisplay = document.getElementById('fileName');
     
+    // Anti-bot: Time tracking
+    let applicationFormOpenTime = null;
+    let contactFormOpenTime = null;
+    
     // ===== APPLY INPUT FORMATTING =====
     
     // Phone number formatting
@@ -201,6 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to open modal
     function openModal() {
         if (modal) {
+            // Anti-bot: Track when form opens
+            applicationFormOpenTime = Date.now();
+            
             // Load active positions before showing modal
             loadActivePositions();
             
@@ -444,6 +451,24 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Get form data
             const formData = new FormData(this);
+            
+            // Anti-bot: Check honeypot field
+            const honeypot = formData.get('website');
+            if (honeypot) {
+                console.log('Bot detected: honeypot filled');
+                alert('Sorry, there was an error submitting your application. Please try again.');
+                return;
+            }
+            
+            // Anti-bot: Check submission timing
+            if (applicationFormOpenTime) {
+                const timeTaken = (Date.now() - applicationFormOpenTime) / 1000; // seconds
+                if (timeTaken < 2) {
+                    console.log('Bot detected: submitted too quickly (' + timeTaken + 's)');
+                    alert('Please take your time filling out the form.');
+                    return;
+                }
+            }
             
             // Prepare application data
             const firstName = formData.get('firstName') || '';
@@ -969,6 +994,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to open contact modal
     function openContactModal(selectedService) {
         if (contactModal) {
+            // Anti-bot: Track when form opens
+            contactFormOpenTime = Date.now();
+            
             contactModal.style.display = 'flex';
             setTimeout(() => {
                 contactModal.classList.add('active');
@@ -1272,6 +1300,24 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Get form data
             const formData = new FormData(this);
+            
+            // Anti-bot: Check honeypot field
+            const honeypot = formData.get('company');
+            if (honeypot) {
+                console.log('Bot detected: honeypot filled');
+                alert('Sorry, there was an error submitting your message. Please try again.');
+                return;
+            }
+            
+            // Anti-bot: Check submission timing
+            if (contactFormOpenTime) {
+                const timeTaken = (Date.now() - contactFormOpenTime) / 1000; // seconds
+                if (timeTaken < 2) {
+                    console.log('Bot detected: submitted too quickly (' + timeTaken + 's)');
+                    alert('Please take your time filling out the form.');
+                    return;
+                }
+            }
             
             // Collect all service-specific details
             const serviceDetails = {};
