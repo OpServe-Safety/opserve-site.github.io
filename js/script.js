@@ -442,12 +442,6 @@ document.addEventListener('DOMContentLoaded', function() {
         applicationForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Validate that at least one file is selected
-            if (selectedFiles.length === 0) {
-                alert('Please upload at least one file (resume or certification).');
-                return;
-            }
-            
             // Get form data
             const formData = new FormData(this);
             
@@ -470,7 +464,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 startDate: startDates[index],
                 endDate: endDates[index],
                 description: jobDescriptions[index]
-            }));
+            })).filter(entry => entry.jobTitle && entry.company); // Filter out empty entries
+            
+            // Validate that either files are uploaded OR work history is filled out
+            if (selectedFiles.length === 0 && workHistory.length === 0) {
+                alert('Please either upload a resume/certification OR fill out your work history.');
+                return;
+            }
             
             try {
                 // Step 1: Upload files to Supabase Storage
