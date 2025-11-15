@@ -441,13 +441,16 @@ header .btn:focus {
 }
 
 .btn-apply {
-    background: #28a745;
-    border-color: #28a745;
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
 }
 
 .btn-apply:hover {
-    background: #218838;
-    border-color: #1e7e34;
+    background-color: var(--primary-color);
+    color: var(--white);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* About Section */
